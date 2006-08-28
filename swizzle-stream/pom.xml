@@ -17,18 +17,18 @@
   </dependencies>
   <distributionManagement>
     <repository>
-      <id>swizzle</id>
-      <name>swizzle Central Repository</name>
-      <url>scpexe://swizzle.codehaus.org/home/projects/swizzle/repository</url>
+      <id>codehaus.org</id>
+      <name>Swizzle Central Repository</name>
+      <url>dav:https://dav.codehaus.org/repository/swizzle/</url>
     </repository>
     <snapshotRepository>
-      <id>swizzle-snapshots</id>
-      <name>swizzle Central Development Repository</name>
-      <url>scpexe://swizzle.codehaus.org/home/projects/swizzle/repository-snapshot</url>
+      <id>codehaus.org</id>
+      <name>Swizzle Central Development Repository</name>
+      <url>dav:https://dav.codehaus.org/snapshots.repository/swizzle/</url>
     </snapshotRepository>
     <site>
-      <id>swizzle</id>
-      <url>scpexe://swizzle.codehaus.org/home/projects/swizzle/public_html/maven/</url>
+      <id>codehaus.org</id>
+      <url>dav:https://dav.codehaus.org/swizzle/</url>
     </site>
   </distributionManagement>
 </project>
