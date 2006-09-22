@@ -26,7 +26,7 @@ import java.io.BufferedInputStream;
 /**
  * @version $Revision$ $Date$
  */
-public class MakeDownloadPageTest extends TestCase {
+public class MakeDownloadPageScrap extends TestCase {
 
     public void testFoo() throws Exception {
         URL url = new URL("http://www.ibiblio.org/maven2/org/codehaus/swizzle/");
