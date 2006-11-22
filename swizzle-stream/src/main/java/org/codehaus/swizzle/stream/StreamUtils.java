@@ -23,7 +23,7 @@ import java.io.ByteArrayInputStream;
 /**
  * @version $Revision$ $Date$
  */
-public class TestUtil {
+public class StreamUtils {
     public static String streamToString(InputStream in) throws IOException {
         StringBuffer text = new StringBuffer();
         try {
