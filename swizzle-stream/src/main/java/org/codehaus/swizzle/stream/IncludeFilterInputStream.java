@@ -29,13 +29,17 @@ public class IncludeFilterInputStream extends FilterInputStream {
     protected boolean wanted;
 
     public IncludeFilterInputStream(InputStream in, String begin, String end) {
+        this(in, begin, end, true);
+    }
+
+    public IncludeFilterInputStream(InputStream in, String begin, String end, boolean caseSensitive) {
         super(in);
 
         beginBuffer = new ScanBuffer(begin.length());
         endBuffer = new ScanBuffer(end.length());
 
-        beginBuffer.setScanString(begin, false);
-        endBuffer.setScanString(end, false);
+        beginBuffer.setScanString(begin, caseSensitive);
+        endBuffer.setScanString(end, caseSensitive);
     }
 
     public int read() throws IOException {
