@@ -28,6 +28,9 @@ import java.io.BufferedInputStream;
  */
 public class MakeDownloadPageScrap extends TestCase {
 
+    public static void main(String[] args) throws Exception {
+        new MakeDownloadPageScrap().testFoo();
+    }
     public void testFoo() throws Exception {
         URL url = new URL("http://www.ibiblio.org/maven2/org/codehaus/swizzle/");
         InputStream in = url.openStream();
@@ -37,15 +40,16 @@ public class MakeDownloadPageScrap extends TestCase {
 
         lexer.readToken("Parent Directory");
 
-        while (lexer.readToken("HREF") != null) {
+        while (lexer.readToken("href") != null) {
             String link = lexer.readToken("\"","/\"");
-            String date = lexer.readToken("</A>"," -");
+            String date = lexer.readToken("</a>"," -");
             date = date.trim();
 
             System.out.println("h3. "+link);
 
             URL artifactUrl = new URL(url, link);
             print(artifactUrl);
+            System.out.println("");
 
         }
 
@@ -62,8 +66,8 @@ public class MakeDownloadPageScrap extends TestCase {
         lexer.readToken("Parent Directory");
 
         while (lexer.readToken("folder.gif") != null) {
-            String link = lexer.readToken("HREF=\"","/\"");
-            String date = lexer.readToken("</A>"," -");
+            String link = lexer.readToken("href=\"","/\"");
+            String date = lexer.readToken("</a>"," -");
             date = date.trim();
             System.out.println("* ["+link+"|"+url.toExternalForm()+"]  -  "+date );
         }

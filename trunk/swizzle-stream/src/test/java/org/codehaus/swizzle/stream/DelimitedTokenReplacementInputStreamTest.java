@@ -104,9 +104,9 @@ public class DelimitedTokenReplacementInputStreamTest extends TestCase {
     }
 
     private void swizzleAndAssert(String original, String expected) throws IOException {
-        InputStream in = TestUtil.stringToStream(original);
+        InputStream in = StreamUtils.stringToStream(original);
         in = new DelimitedTokenReplacementInputStream(in, "{", "}", testTokenHandler);
-        String actual = TestUtil.streamToString(in);
+        String actual = StreamUtils.streamToString(in);
 
         assertEquals(expected, actual);
     }

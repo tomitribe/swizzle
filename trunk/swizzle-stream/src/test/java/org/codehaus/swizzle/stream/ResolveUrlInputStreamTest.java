@@ -64,11 +64,11 @@ public class ResolveUrlInputStreamTest extends TestCase {
 
 
     private String resolveURLs(String original, URL url) throws IOException {
-        InputStream in = TestUtil.stringToStream(original);
+        InputStream in = StreamUtils.stringToStream(original);
         in = new ResolveUrlInputStream(in, "<A HREF=", ">", url);
         in = new org.codehaus.swizzle.stream.ResolveUrlInputStream(in, "SRC=\"", "\"", url);
 
-        return TestUtil.streamToString(in);
+        return StreamUtils.streamToString(in);
     }
 
 }

@@ -34,10 +34,10 @@ public class ExecuteMacroInputStreamTest extends TestCase {
 
         String original = "Some template {date:tz=PST}.  With some web content {wget:url=file:target/test-classes/fuzzbucket/widget.txt} and \n{file:path=target/test-classes/fuzzbucket/DoHickey.java.txt}";
 
-        InputStream in = TestUtil.stringToStream(original);
+        InputStream in = StreamUtils.stringToStream(original);
         in = new ExecuteMacroInputStream(in, "{","}", macros);
 
-        String actual = TestUtil.streamToString(in);
+        String actual = StreamUtils.streamToString(in);
         String expected = "Some template {date:tz=PST}.  With some web content This content is from the widget.txt file and \n" +
                 "public class DoHickey {\n" +
                 "    public String whatIsIt(){\n" +

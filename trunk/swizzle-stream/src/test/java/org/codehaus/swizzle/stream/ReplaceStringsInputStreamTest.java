@@ -124,7 +124,7 @@ public class ReplaceStringsInputStreamTest extends TestCase {
     }
 
     private void swizzleAndAssert(String original, String expected) throws IOException {
-        InputStream in = TestUtil.stringToStream(original);
+        InputStream in = StreamUtils.stringToStream(original);
 
         Map strings = new HashMap();
         strings.put("GREEN", "grape");
@@ -132,7 +132,7 @@ public class ReplaceStringsInputStreamTest extends TestCase {
         strings.put("BLUE", "banana");
         in = new ReplaceStringsInputStream(in, strings);
 
-        String actual = TestUtil.streamToString(in);
+        String actual = StreamUtils.streamToString(in);
 
         assertEquals(expected, actual);
     }
@@ -170,8 +170,8 @@ public class ReplaceStringsInputStreamTest extends TestCase {
         out.close();
 
 
-        String expectedContent = TestUtil.streamToString(new FileInputStream(expected));
-        String actualContent = TestUtil.streamToString(new FileInputStream(actual));
+        String expectedContent = StreamUtils.streamToString(new FileInputStream(expected));
+        String actualContent = StreamUtils.streamToString(new FileInputStream(actual));
         assertEquals(expectedContent, actualContent);
     }
 
