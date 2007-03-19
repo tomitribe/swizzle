@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.codehaus.swizzle</groupId>
   <artifactId>swizzle-stream</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <name>Swizzle :: Stream</name>
   <url>http://swizzle.codehaus.org</url>
   <build>
@@ -41,7 +40,7 @@
     </site>
   </distributionManagement>
   <scm>
-    <connection>scm:svn:http://svn.codehaus.org/swizzle/trunk/swizzle-stream/</connection>
-    <developerConnection>scm:svn:https://${maven.username}@svn.codehaus.org/swizzle/trunk/swizzle-stream/</developerConnection>
+    <connection>scm:svn:http://svn.codehaus.org/swizzle/tags/swizzle-stream-1.0.2</connection>
+    <developerConnection>scm:svn:https://${maven.username}@svn.codehaus.org/swizzle/tags/swizzle-stream-1.0.2</developerConnection>
   </scm>
 </project>
