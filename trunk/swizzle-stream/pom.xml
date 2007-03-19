@@ -41,6 +41,6 @@
   </distributionManagement>
   <scm>
     <connection>scm:svn:http://svn.codehaus.org/swizzle/trunk/swizzle-stream</connection>
-    <developerConnection>scm:svn:https://@svn.codehaus.org/swizzle/trunk/swizzle-stream</developerConnection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/swizzle/trunk/swizzle-stream</developerConnection>
   </scm>
 </project>
