@@ -4,7 +4,7 @@
   <groupId>org.codehaus.swizzle</groupId>
   <artifactId>swizzle-stream</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.2</version>
+  <version>1.0.2-SNAPSHOT</version>
   <name>Swizzle :: Stream</name>
   <url>http://swizzle.codehaus.org</url>
   <build>
@@ -40,4 +40,8 @@
       <url>dav:https://dav.codehaus.org/swizzle/</url>
     </site>
   </distributionManagement>
+  <scm>
+    <connection>scm:svn:http://svn.codehaus.org/swizzle/trunk/swizzle-stream/</connection>
+    <developerConnection>scm:svn:https://${maven.username}@svn.codehaus.org/swizzle/trunk/swizzle-stream/</developerConnection>
+  </scm>
 </project>
