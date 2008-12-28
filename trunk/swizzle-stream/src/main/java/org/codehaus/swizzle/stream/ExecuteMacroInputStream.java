@@ -16,16 +16,14 @@
  */
 package org.codehaus.swizzle.stream;
 
-import org.codehaus.swizzle.stream.DelimitedTokenReplacementInputStream;
-
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
-import java.net.URL;
 
 /**
  * Really more of an example than anything else.  Sky is the limit.

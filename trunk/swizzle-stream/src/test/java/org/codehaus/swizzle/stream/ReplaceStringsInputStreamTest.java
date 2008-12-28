@@ -17,8 +17,6 @@
 
 package org.codehaus.swizzle.stream;
 
-import junit.framework.TestCase;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,7 +25,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.swizzle.stream.ReplaceStringsInputStream;
+import junit.framework.TestCase;
 
 public class ReplaceStringsInputStreamTest extends TestCase {
 

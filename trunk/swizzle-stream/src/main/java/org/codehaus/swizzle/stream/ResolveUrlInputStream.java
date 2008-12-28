@@ -16,8 +16,6 @@
  */
 package org.codehaus.swizzle.stream;
 
-import org.codehaus.swizzle.stream.DelimitedTokenReplacementInputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

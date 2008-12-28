@@ -19,11 +19,10 @@ package org.codehaus.swizzle.stream;
  * @version $Revision$ $Date$
  */
 
-import junit.framework.*;
-import org.codehaus.swizzle.stream.ExecuteMacroInputStream;
-
-import java.util.HashMap;
 import java.io.InputStream;
+import java.util.HashMap;
+
+import junit.framework.TestCase;
 
 public class ExecuteMacroInputStreamTest extends TestCase {
 

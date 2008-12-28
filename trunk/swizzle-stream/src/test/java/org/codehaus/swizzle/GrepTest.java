@@ -17,7 +17,6 @@
 package org.codehaus.swizzle;
 
 import junit.framework.TestCase;
-import org.codehaus.swizzle.Grep;
 
 /**
  * @version $Rev$ $Date$

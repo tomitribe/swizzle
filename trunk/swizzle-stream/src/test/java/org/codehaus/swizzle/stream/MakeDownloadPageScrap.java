@@ -16,12 +16,11 @@
  */
 package org.codehaus.swizzle.stream;
 
-import junit.framework.TestCase;
-
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.io.InputStream;
 import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.URL;
+
+import junit.framework.TestCase;
 
 /**
  * @version $Revision$ $Date$
