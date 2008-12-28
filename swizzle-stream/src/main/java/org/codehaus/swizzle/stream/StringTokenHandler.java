@@ -17,11 +17,9 @@
 
 package org.codehaus.swizzle.stream;
 
-import org.codehaus.swizzle.stream.StreamTokenHandler;
-
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @version $Revision$ $Date$

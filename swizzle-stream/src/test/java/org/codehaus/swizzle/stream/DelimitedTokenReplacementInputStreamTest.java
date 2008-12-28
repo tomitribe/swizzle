@@ -20,14 +20,10 @@ package org.codehaus.swizzle.stream;
  * @version $Revision$ $Date$
  */
 
-import junit.framework.TestCase;
-
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.swizzle.stream.DelimitedTokenReplacementInputStream;
-import org.codehaus.swizzle.stream.StreamTokenHandler;
-import org.codehaus.swizzle.stream.StringTokenHandler;
+import junit.framework.TestCase;
 
 public class DelimitedTokenReplacementInputStreamTest extends TestCase {
 

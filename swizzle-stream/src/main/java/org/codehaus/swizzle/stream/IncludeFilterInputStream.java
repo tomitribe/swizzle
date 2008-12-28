@@ -16,8 +16,6 @@
  */
 package org.codehaus.swizzle.stream;
 
-import org.codehaus.swizzle.stream.ScanBuffer;
-
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;

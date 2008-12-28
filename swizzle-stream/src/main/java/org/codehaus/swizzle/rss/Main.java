@@ -16,13 +16,6 @@
  */
 package org.codehaus.swizzle.rss;
 
-import org.codehaus.swizzle.rss.OReillyNewsGrabber;
-import org.codehaus.swizzle.rss.RssItem;
-import org.codehaus.swizzle.rss.RssFeed;
-
-import java.io.PrintStream;
-import java.util.Collection;
-import java.util.Iterator;
 
 public class Main {
 

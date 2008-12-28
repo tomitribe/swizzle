@@ -17,10 +17,8 @@
 
 package org.codehaus.swizzle.stream;
 
-import org.codehaus.swizzle.stream.FixedTokenReplacementInputStream;
-
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /**
  * @version $Revision$ $Date$
