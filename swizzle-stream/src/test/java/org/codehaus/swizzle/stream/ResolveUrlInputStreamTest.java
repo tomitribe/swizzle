@@ -19,11 +19,11 @@ package org.codehaus.swizzle.stream;
  * @version $Revision$ $Date$
  */
 
+import junit.framework.TestCase;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-
-import junit.framework.TestCase;
 
 public class ResolveUrlInputStreamTest extends TestCase {
 

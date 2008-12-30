@@ -19,13 +19,13 @@ package org.codehaus.swizzle.stream;
  * @version $Revision$ $Date$
  */
 
+import junit.framework.TestCase;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import junit.framework.TestCase;
 
 public class ReplaceStringInputStreamTest extends TestCase {
 
