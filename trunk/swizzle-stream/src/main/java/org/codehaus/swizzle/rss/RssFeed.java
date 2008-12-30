@@ -16,16 +16,16 @@
  */
 package org.codehaus.swizzle.rss;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
+import java.util.Collection;
+import java.util.List;
+import java.util.Vector;
 
 public class RssFeed {
 

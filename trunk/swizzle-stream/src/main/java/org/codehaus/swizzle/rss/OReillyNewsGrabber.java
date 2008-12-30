@@ -16,14 +16,14 @@
  */
 package org.codehaus.swizzle.rss;
 
+import org.codehaus.swizzle.stream.ExcludeFilterInputStream;
+import org.codehaus.swizzle.stream.IncludeFilterInputStream;
+import org.codehaus.swizzle.stream.ResolveUrlInputStream;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-
-import org.codehaus.swizzle.stream.ExcludeFilterInputStream;
-import org.codehaus.swizzle.stream.IncludeFilterInputStream;
-import org.codehaus.swizzle.stream.ResolveUrlInputStream;
 
 public class OReillyNewsGrabber implements NewsGrabber {
     public String getContent(String link) throws IOException {

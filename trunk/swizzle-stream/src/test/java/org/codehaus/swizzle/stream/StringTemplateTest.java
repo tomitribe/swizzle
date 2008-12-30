@@ -19,9 +19,9 @@ package org.codehaus.swizzle.stream;
  * @version $Revision$ $Date$
  */
 
-import java.util.HashMap;
-
 import junit.framework.TestCase;
+
+import java.util.HashMap;
 
 public class StringTemplateTest extends TestCase {
     public void testApply() throws Exception {

@@ -16,13 +16,13 @@
  */
 package org.codehaus.swizzle.rss;
 
+import org.codehaus.swizzle.stream.ExcludeFilterInputStream;
+import org.codehaus.swizzle.stream.IncludeFilterInputStream;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-
-import org.codehaus.swizzle.stream.ExcludeFilterInputStream;
-import org.codehaus.swizzle.stream.IncludeFilterInputStream;
 
 
 public class OSDNNewsGrabber implements NewsGrabber {
