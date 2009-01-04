@@ -15,6 +15,7 @@
  *  limitations under the License.
  */
 package org.codehaus.swizzle.stream;
+
 /**
  * @version $Revision$ $Date$
  */
@@ -138,7 +139,7 @@ public class ReplaceStringInputStreamTest extends TestCase {
         File actual = new File("target/test-classes/fixedtoken/PipedTokenReplacement.actual.java.txt");
 
         // Notice that this output results in all varaibles and accessors
-        // being scoped at "public".  This is a piped setup, so the output
+        // being scoped at "public". This is a piped setup, so the output
         // of one ReplaceStringInputStream is the input of another.
         // On of them turns all occurrences of "public" into "private"
         // The next one turns all occurrences "private" into "public"
@@ -148,7 +149,10 @@ public class ReplaceStringInputStreamTest extends TestCase {
         in = new ReplaceStringInputStream(in, "org.codehaus", "biz.codehizzle");
         in = new ReplaceStringInputStream(in, "Copyright", "Copyrizzle");
         in = new ReplaceStringInputStream(in, "public", "private");
-        in = new ReplaceStringInputStream(in, "private", "public"); // Guess what will happen here
+        in = new ReplaceStringInputStream(in, "private", "public"); // Guess
+                                                                    // what will
+                                                                    // happen
+                                                                    // here
         in = new ReplaceStringInputStream(in, "Token", "ParsedString");
         in = new ReplaceStringInputStream(in, "token", "parsedString");
         in = new ReplaceStringInputStream(in, "parent", "parentURL");
@@ -165,7 +169,6 @@ public class ReplaceStringInputStreamTest extends TestCase {
         }
         in.close();
         out.close();
-
 
         String expectedContent = StreamUtils.streamToString(new FileInputStream(expected));
         String actualContent = StreamUtils.streamToString(new FileInputStream(actual));

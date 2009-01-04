@@ -118,7 +118,6 @@ public class ReplaceStringsInputStreamTest extends TestCase {
         expected = "abcgrapegrapedebananabananafgrapebananaghipearstuvwxyz";
         swizzleAndAssert(original, expected);
 
-
     }
 
     private void swizzleAndAssert(String original, String expected) throws IOException {
@@ -149,7 +148,6 @@ public class ReplaceStringsInputStreamTest extends TestCase {
         strings.put("begin", "startText");
         strings.put("link", "location");
 
-
         File original = new File("target/test-classes/fixedtoken/ResolveUrlInputStream.original.java.txt");
         File expected = new File("target/test-classes/fixedtoken/ResolveUrlInputStream.expected.java.txt");
         File actual = new File("target/test-classes/fixedtoken/ResolveUrlInputStream.actual.java.txt");
@@ -166,7 +164,6 @@ public class ReplaceStringsInputStreamTest extends TestCase {
         }
         in.close();
         out.close();
-
 
         String expectedContent = StreamUtils.streamToString(new FileInputStream(expected));
         String actualContent = StreamUtils.streamToString(new FileInputStream(actual));

@@ -18,7 +18,6 @@ package org.codehaus.swizzle.rss;
 
 import java.io.IOException;
 
-
 public class RssItem {
 
     private NewsGrabber newsGrabber;
@@ -32,7 +31,7 @@ public class RssItem {
         this.link = link;
         this.description = description;
         this.newsGrabber = new OReillyNewsGrabber();
-        //this.newsGrabber = new SlashdotNewsGrabber();
+        // this.newsGrabber = new SlashdotNewsGrabber();
     }
 
     public String getType() {
@@ -59,5 +58,3 @@ public class RssItem {
     }
 
 }
-
-

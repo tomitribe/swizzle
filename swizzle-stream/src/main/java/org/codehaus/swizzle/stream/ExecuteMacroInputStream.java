@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Really more of an example than anything else.  Sky is the limit.
+ * Really more of an example than anything else. Sky is the limit.
+ * 
  * @version $Revision$ $Date$
  */
 public class ExecuteMacroInputStream extends DelimitedTokenReplacementInputStream {
@@ -43,7 +44,8 @@ public class ExecuteMacroInputStream extends DelimitedTokenReplacementInputStrea
 
         public InputStream processToken(String token) throws IOException {
             String macroName = token.substring(0, token.indexOf(":"));
-            // TODO: Construct the "macro" and use the name value pairs to perform IoC
+            // TODO: Construct the "macro" and use the name value pairs to
+            // perform IoC
             StreamTokenHandler macro = (StreamTokenHandler) macros.get(macroName);
             if (macro == null) {
                 macro = new UnknownMacro();
@@ -58,7 +60,7 @@ public class ExecuteMacroInputStream extends DelimitedTokenReplacementInputStrea
 
         public Macro(String token) throws IOException {
             this.name = token.substring(0, token.indexOf(":"));
-            token = token.substring(name.length()+1);
+            token = token.substring(name.length() + 1);
 
             // This part could benefit from escaping
             String parameters = token.replace('|', '\n');
@@ -83,7 +85,7 @@ public class ExecuteMacroInputStream extends DelimitedTokenReplacementInputStrea
 
     public static class UnknownMacro extends StringTokenHandler {
         public String handleToken(String token) throws IOException {
-            return "{"+token+"}";
+            return "{" + token + "}";
         }
     }
 

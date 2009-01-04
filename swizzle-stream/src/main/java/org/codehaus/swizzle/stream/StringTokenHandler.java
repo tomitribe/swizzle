@@ -30,7 +30,7 @@ public abstract class StringTokenHandler implements StreamTokenHandler {
 
     public final InputStream processToken(String token) throws IOException {
         String result = handleToken(token);
-        result = (result != null)? result: "null";
+        result = (result != null) ? result : "null";
         return new ByteArrayInputStream(result.getBytes());
     }
 

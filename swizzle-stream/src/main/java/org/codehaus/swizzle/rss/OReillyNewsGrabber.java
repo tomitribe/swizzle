@@ -45,9 +45,9 @@ public class OReillyNewsGrabber implements NewsGrabber {
         url = new URL(url, "/lpt" + text);
         text = new StringBuffer();
 
-//        text.append(url.toExternalForm()+"</br>");
-//        text.append(absoluteURL+"</br>");
-//        text.append(relativeURL+"</br>");
+        // text.append(url.toExternalForm()+"</br>");
+        // text.append(absoluteURL+"</br>");
+        // text.append(relativeURL+"</br>");
 
         in = new BufferedInputStream(url.openStream());
 
@@ -64,10 +64,10 @@ public class OReillyNewsGrabber implements NewsGrabber {
 
         try {
             while ((b = in.read()) != -1) {
-                //System.out.print((char) b);
+                // System.out.print((char) b);
                 text.append((char) b);
             }
-            //System.out.println("\n\n\nDONE\n\n\n");
+            // System.out.println("\n\n\nDONE\n\n\n");
         } finally {
             in.close();
         }

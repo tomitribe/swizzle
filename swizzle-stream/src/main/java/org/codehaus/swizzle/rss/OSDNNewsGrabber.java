@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-
 public class OSDNNewsGrabber implements NewsGrabber {
     public String getContent(String link) throws IOException {
         link = link.replaceFirst("article.pl", "print.pl");

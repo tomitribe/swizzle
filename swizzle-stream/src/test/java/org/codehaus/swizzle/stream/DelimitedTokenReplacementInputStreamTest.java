@@ -29,7 +29,6 @@ public class DelimitedTokenReplacementInputStreamTest extends TestCase {
 
     StreamTokenHandler testTokenHandler = new TestTokenHandler();
 
-
     public void testTokenizingFilterInputStream() throws Exception {
         String original = "";
         String expected = "";

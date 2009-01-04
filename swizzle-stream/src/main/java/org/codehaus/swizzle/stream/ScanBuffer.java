@@ -47,7 +47,7 @@ public class ScanBuffer {
     }
 
     public String toString() {
-        return super.toString()+"#"+getScanString()+" # buffer="+new String(buffer);
+        return super.toString() + "#" + getScanString() + " # buffer=" + new String(buffer);
     }
 
     public void resetPosition() {
@@ -74,8 +74,9 @@ public class ScanBuffer {
         }
 
         pos = 0;
-        if (!cs) for (int i = 0; i < token.length; i++)
-            token[i] = Character.toLowerCase(token[i]);
+        if (!cs)
+            for (int i = 0; i < token.length; i++)
+                token[i] = Character.toLowerCase(token[i]);
 
         flush();
     }
@@ -101,35 +102,38 @@ public class ScanBuffer {
 
     public boolean match() {
 
-        // Absolute position (apos) is the number of characters actually searched.
+        // Absolute position (apos) is the number of characters actually
+        // searched.
         // This number should never exceed the length of the token.
         int apos = token.length - 1;
 
         // The relative position indicates where we are on the buffer.
         // It is possible to reach the end of the buffer before we are
-        // finished searching enough characters.  In this contition we
-        // wrap to the beginning of the buffer and continue matching 
+        // finished searching enough characters. In this contition we
+        // wrap to the beginning of the buffer and continue matching
         // the remaining chars of the token array against the buffer.
         int rpos = pos - 1;
 
-        // We start the search, possibly from the middle of the buffer, 
-        // and go as far as we can.  We will either come to the end of the 
-        // token or the end of the buffer. If we come to the end of the 
+        // We start the search, possibly from the middle of the buffer,
+        // and go as far as we can. We will either come to the end of the
+        // token or the end of the buffer. If we come to the end of the
         // buffer the next for loop wil naturally pick up at the beginning
-        // of the buffer and continue matching where we left off in the 
+        // of the buffer and continue matching where we left off in the
         // token array.
         for (; rpos > -1 && apos > -1; rpos--, apos--) {
-            if (buffer[rpos] != token[apos]) return false;
+            if (buffer[rpos] != token[apos])
+                return false;
         }
         for (rpos = buffer.length - 1; apos > -1; rpos--, apos--) {
-            if (buffer[rpos] != token[apos]) return false;
+            if (buffer[rpos] != token[apos])
+                return false;
         }
-//       for (; rpos < buffer.length && apos < token.length; rpos++, apos++) {
-//           if (buffer[rpos] != token[apos]) return false;
-//       }
-//       for (rpos = 0; apos < token.length; rpos++, apos++ ) {
-//           if (buffer[rpos] != token[apos]) return false;
-//       }
+        // for (; rpos < buffer.length && apos < token.length; rpos++, apos++) {
+        // if (buffer[rpos] != token[apos]) return false;
+        // }
+        // for (rpos = 0; apos < token.length; rpos++, apos++ ) {
+        // if (buffer[rpos] != token[apos]) return false;
+        // }
 
         return true;
     }
@@ -138,10 +142,12 @@ public class ScanBuffer {
         int apos = token.length - 1;
         int rpos = pos - 1;
         for (; rpos > -1 && apos > -1; rpos--, apos--) {
-            if (buffer2[rpos] != -1) return true;
+            if (buffer2[rpos] != -1)
+                return true;
         }
         for (rpos = buffer2.length - 1; apos > -1; rpos--, apos--) {
-            if (buffer2[rpos] != -1) return true;
+            if (buffer2[rpos] != -1)
+                return true;
         }
         return false;
     }
@@ -153,19 +159,20 @@ public class ScanBuffer {
     public void clear(int i) {
         char NULL = (char) -1;
 
-        // Absolute position (apos) is the number of characters actually searched.
+        // Absolute position (apos) is the number of characters actually
+        // searched.
         // This number should never exceed the length of the token.
         int apos = i - 1;
 
         // The relative position indicates where we are on the buffer.
         // It is possible to reach the end of the buffer before we are
-        // finished searching enough characters.  In this contition we
+        // finished searching enough characters. In this contition we
         // wrap to the beginning of the buffer and continue matching
         // the remaining chars of the token array against the buffer.
         int rpos = pos - 1;
 
         // We start the search, possibly from the middle of the buffer,
-        // and go as far as we can.  We will either come to the end of the
+        // and go as far as we can. We will either come to the end of the
         // token or the end of the buffer. If we come to the end of the
         // buffer the next for loop wil naturally pick up at the beginning
         // of the buffer and continue matching where we left off in the

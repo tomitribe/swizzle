@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-
 public class SlashdotNewsGrabber implements NewsGrabber {
     public String getContent(String link) throws IOException {
         System.out.println(link);
@@ -43,6 +42,7 @@ public class SlashdotNewsGrabber implements NewsGrabber {
             text.append((char) b);
         }
         in.close();
-        return text.toString().replaceFirst("</FONT><BR>", "</FONT><BR><BR>").replaceFirst("Posted by", "<br><FONT SIZE=\"2\">Posted by").replaceFirst("M</B><BR>", "M</font></B><BR>");
+        return text.toString().replaceFirst("</FONT><BR>", "</FONT><BR><BR>").replaceFirst("Posted by",
+                "<br><FONT SIZE=\"2\">Posted by").replaceFirst("M</B><BR>", "M</font></B><BR>");
     }
 }

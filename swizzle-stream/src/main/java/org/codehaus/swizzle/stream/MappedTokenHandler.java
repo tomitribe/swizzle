@@ -32,7 +32,7 @@ public class MappedTokenHandler extends StringTokenHandler {
 
     public String handleToken(String token) {
         Object object = entries.get(token);
-        if (object != null){
+        if (object != null) {
             return object.toString();
         }
         return token;
