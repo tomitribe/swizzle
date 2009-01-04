@@ -33,7 +33,8 @@ public class FixedTokenListReplacementInputStream extends FilterInputStream {
         this(in, tokens, handler, true);
     }
 
-    public FixedTokenListReplacementInputStream(InputStream in, List tokens, StreamTokenHandler handler, boolean caseSensitive) {
+    public FixedTokenListReplacementInputStream(InputStream in, List tokens, StreamTokenHandler handler,
+            boolean caseSensitive) {
         super(in);
         int largestBuffer = 0;
         tokenBuffers = new ScanBuffer[tokens.size()];
@@ -41,7 +42,7 @@ public class FixedTokenListReplacementInputStream extends FilterInputStream {
             String token = (String) tokens.get(i);
             ScanBuffer buffer = new ScanBuffer(token, caseSensitive);
             tokenBuffers[i] = buffer;
-            largestBuffer = (buffer.size() > largestBuffer)? buffer.size(): largestBuffer;
+            largestBuffer = (buffer.size() > largestBuffer) ? buffer.size() : largestBuffer;
         }
         this.mainBuffer = new ScanBuffer(largestBuffer);
         this.handler = handler;
@@ -76,9 +77,9 @@ public class FixedTokenListReplacementInputStream extends FilterInputStream {
         public int _read() throws IOException {
             int buffer = mainBuffer.append(-1);
 
-            if (buffer != -1){
+            if (buffer != -1) {
                 return buffer;
-            } else if (mainBuffer.hasData()){
+            } else if (mainBuffer.hasData()) {
                 return _read();
             } else {
                 strategy = flushingValue;
@@ -104,13 +105,13 @@ public class FixedTokenListReplacementInputStream extends FilterInputStream {
 
                     value = handler.processToken(token);
 
-                    if (mainBuffer.hasData()){
+                    if (mainBuffer.hasData()) {
                         strategy = flushingMainBuffer;
                     } else {
                         strategy = flushingValue;
                     }
 
-                    return (buffer != -1)? buffer: read();
+                    return (buffer != -1) ? buffer : read();
                 }
             }
 

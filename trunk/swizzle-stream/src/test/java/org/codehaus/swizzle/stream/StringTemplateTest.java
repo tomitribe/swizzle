@@ -15,6 +15,7 @@
  *  limitations under the License.
  */
 package org.codehaus.swizzle.stream;
+
 /**
  * @version $Revision$ $Date$
  */
@@ -32,6 +33,6 @@ public class StringTemplateTest extends TestCase {
         map.put("name", "bar");
         map.put("ext", "txt");
 
-        assertEquals("foo/bar.txt",dataMask.apply(map));
+        assertEquals("foo/bar.txt", dataMask.apply(map));
     }
 }

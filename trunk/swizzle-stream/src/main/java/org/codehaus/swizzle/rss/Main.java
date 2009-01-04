@@ -16,42 +16,42 @@
  */
 package org.codehaus.swizzle.rss;
 
-
 public class Main {
 
     public Main() {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(new OReillyNewsGrabber().getContent("http://www.oreillynet.com/pub/a/windows/2004/03/23/ie_shells.html"));
+        System.out.println(new OReillyNewsGrabber()
+                .getContent("http://www.oreillynet.com/pub/a/windows/2004/03/23/ie_shells.html"));
 
     }
 
     public static void _main(String[] args) throws Exception {
-//        RssFeed feed = new RssFeed();
-//        //bean.setFeed("http://linux.com/linuxcom.rss");
-//        feed.setFeed("http://www.oreillynet.com/meerkat/?_fl=rss10&t=ALL&c=916");
-//        //bean.setFeed("http://slashdot.org/slashdot.rss");
-//
-//        PrintStream out = System.out;
-//        Collection items = feed.getItems();
-//        for (Iterator iter = items.iterator(); iter.hasNext();) {
-//            RssItem item = (RssItem) iter.next();
-//
-//            if (item.getType().equals("channel")) continue;
-//
-//            out.print("<li class=\"" + item.getType() + "\">");
-//            out.print("<a href=\"" + item.getLink() + "\">");
-//            out.print(item.getTitle());
-//            out.println("</a></li>");
-//            out.println();
-//
-//            out.println(wrap(item.getDescription()));
-//            out.println();
-//            //out.println(wrap(item.getContent()));
-//            out.println(item.getContent());
-//            System.exit(0);
-//        }
+        // RssFeed feed = new RssFeed();
+        // //bean.setFeed("http://linux.com/linuxcom.rss");
+        // feed.setFeed("http://www.oreillynet.com/meerkat/?_fl=rss10&t=ALL&c=916");
+        // //bean.setFeed("http://slashdot.org/slashdot.rss");
+        //
+        // PrintStream out = System.out;
+        // Collection items = feed.getItems();
+        // for (Iterator iter = items.iterator(); iter.hasNext();) {
+        // RssItem item = (RssItem) iter.next();
+        //
+        // if (item.getType().equals("channel")) continue;
+        //
+        // out.print("<li class=\"" + item.getType() + "\">");
+        // out.print("<a href=\"" + item.getLink() + "\">");
+        // out.print(item.getTitle());
+        // out.println("</a></li>");
+        // out.println();
+        //
+        // out.println(wrap(item.getDescription()));
+        // out.println();
+        // //out.println(wrap(item.getContent()));
+        // out.println(item.getContent());
+        // System.exit(0);
+        // }
 
     }
 

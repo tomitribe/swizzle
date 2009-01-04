@@ -27,11 +27,13 @@ public class DelimitedTokenReplacementInputStream extends FilterInputStream {
     private InputStream value;
     private final StreamTokenHandler handler;
 
-    public DelimitedTokenReplacementInputStream(InputStream in, String begin, String end, StreamTokenHandler tokenHandler) {
+    public DelimitedTokenReplacementInputStream(InputStream in, String begin, String end,
+            StreamTokenHandler tokenHandler) {
         this(in, begin, end, tokenHandler, true);
     }
 
-    public DelimitedTokenReplacementInputStream(InputStream in, String begin, String end, StreamTokenHandler tokenHandler, boolean caseSensitive) {
+    public DelimitedTokenReplacementInputStream(InputStream in, String begin, String end,
+            StreamTokenHandler tokenHandler, boolean caseSensitive) {
         super(in);
         this.handler = tokenHandler;
 
@@ -107,7 +109,7 @@ public class DelimitedTokenReplacementInputStream extends FilterInputStream {
                 beginBuffer.flush();
 
                 strategy = readingToken;
-                //return reader._read();
+                // return reader._read();
                 return (buffer == -1 && stream != -1) ? read() : buffer;
             }
 

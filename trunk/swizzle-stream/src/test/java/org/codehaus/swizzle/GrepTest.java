@@ -25,8 +25,7 @@ public class GrepTest extends TestCase {
 
     private String source = "a0\na1\na2\nb0\nb1\nb2\nc0\nc1\nc2\nd0\nd1\nd2\ne0\ne1\ne2\nf0\nf1\nf2\n";
 
-    public void testFilter() throws Exception
-    {
+    public void testFilter() throws Exception {
         assertEquals("", grep(0, "x1"));
 
         assertEquals("c1\n", grep(0, "c1"));
@@ -54,8 +53,7 @@ public class GrepTest extends TestCase {
         assertEquals("a0\na1\na2\nb0\nb1\nb2\nc0\nc1\nc2\nd0\nd1\nd2\ne0\ne1\ne2\nf0\nf1\n", grep(3, "[a,c,e]1"));
     }
 
-    private String grep(int context, String regex)
-    {
+    private String grep(int context, String regex) {
         Grep filter = new Grep(regex, context);
         return filter.filter(source);
     }

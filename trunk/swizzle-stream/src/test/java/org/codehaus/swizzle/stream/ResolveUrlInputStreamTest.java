@@ -15,6 +15,7 @@
  *  limitations under the License.
  */
 package org.codehaus.swizzle.stream;
+
 /**
  * @version $Revision$ $Date$
  */
@@ -59,7 +60,6 @@ public class ResolveUrlInputStreamTest extends TestCase {
 
         assertEquals(exptected, actual);
     }
-
 
     private String resolveURLs(String original, URL url) throws IOException {
         InputStream in = StreamUtils.stringToStream(original);
