@@ -38,9 +38,7 @@ public class ExecuteMacroInputStreamTest extends TestCase {
         in = new ExecuteMacroInputStream(in, "{", "}", macros);
 
         String actual = StreamUtils.streamToString(in);
-        String expected = "Some template {date:tz=PST}.  With some web content This content is from the widget.txt file and \n"
-                + "public class DoHickey {\n"
-                + "    public String whatIsIt(){\n"
+        String expected = "Some template {date:tz=PST}.  With some web content This content is from the widget.txt file and \n" + "public class DoHickey {\n" + "    public String whatIsIt(){\n"
                 + "        return \"i don't know\";\n" + "    }\n" + "}";
 
         assertEquals(expected, actual);

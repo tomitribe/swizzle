@@ -33,8 +33,7 @@ public class FixedTokenListReplacementInputStream extends FilterInputStream {
         this(in, tokens, handler, true);
     }
 
-    public FixedTokenListReplacementInputStream(InputStream in, List tokens, StreamTokenHandler handler,
-            boolean caseSensitive) {
+    public FixedTokenListReplacementInputStream(InputStream in, List tokens, StreamTokenHandler handler, boolean caseSensitive) {
         super(in);
         int largestBuffer = 0;
         tokenBuffers = new ScanBuffer[tokens.size()];

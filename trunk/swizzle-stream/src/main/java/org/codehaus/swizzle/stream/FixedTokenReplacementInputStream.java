@@ -30,8 +30,7 @@ public class FixedTokenReplacementInputStream extends FilterInputStream {
         this(in, token, handler, true);
     }
 
-    public FixedTokenReplacementInputStream(InputStream in, String token, StreamTokenHandler handler,
-            boolean caseSensitive) {
+    public FixedTokenReplacementInputStream(InputStream in, String token, StreamTokenHandler handler, boolean caseSensitive) {
         super(in);
         tokenBuffer = new ScanBuffer(token, caseSensitive);
         this.handler = handler;
