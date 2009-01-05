@@ -42,7 +42,6 @@ public class SlashdotNewsGrabber implements NewsGrabber {
             text.append((char) b);
         }
         in.close();
-        return text.toString().replaceFirst("</FONT><BR>", "</FONT><BR><BR>").replaceFirst("Posted by",
-                "<br><FONT SIZE=\"2\">Posted by").replaceFirst("M</B><BR>", "M</font></B><BR>");
+        return text.toString().replaceFirst("</FONT><BR>", "</FONT><BR><BR>").replaceFirst("Posted by", "<br><FONT SIZE=\"2\">Posted by").replaceFirst("M</B><BR>", "M</font></B><BR>");
     }
 }

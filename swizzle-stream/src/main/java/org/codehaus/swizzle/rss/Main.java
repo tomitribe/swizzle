@@ -22,8 +22,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(new OReillyNewsGrabber()
-                .getContent("http://www.oreillynet.com/pub/a/windows/2004/03/23/ie_shells.html"));
+        System.out.println(new OReillyNewsGrabber().getContent("http://www.oreillynet.com/pub/a/windows/2004/03/23/ie_shells.html"));
 
     }
 
