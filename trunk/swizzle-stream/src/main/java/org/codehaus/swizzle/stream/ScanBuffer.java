@@ -74,9 +74,8 @@ public class ScanBuffer {
         }
 
         pos = 0;
-        if (!cs)
-            for (int i = 0; i < token.length; i++)
-                token[i] = Character.toLowerCase(token[i]);
+        if (!cs) for (int i = 0; i < token.length; i++)
+            token[i] = Character.toLowerCase(token[i]);
 
         flush();
     }
@@ -121,12 +120,10 @@ public class ScanBuffer {
         // of the buffer and continue matching where we left off in the
         // token array.
         for (; rpos > -1 && apos > -1; rpos--, apos--) {
-            if (buffer[rpos] != token[apos])
-                return false;
+            if (buffer[rpos] != token[apos]) return false;
         }
         for (rpos = buffer.length - 1; apos > -1; rpos--, apos--) {
-            if (buffer[rpos] != token[apos])
-                return false;
+            if (buffer[rpos] != token[apos]) return false;
         }
         // for (; rpos < buffer.length && apos < token.length; rpos++, apos++) {
         // if (buffer[rpos] != token[apos]) return false;
@@ -142,12 +139,10 @@ public class ScanBuffer {
         int apos = token.length - 1;
         int rpos = pos - 1;
         for (; rpos > -1 && apos > -1; rpos--, apos--) {
-            if (buffer2[rpos] != -1)
-                return true;
+            if (buffer2[rpos] != -1) return true;
         }
         for (rpos = buffer2.length - 1; apos > -1; rpos--, apos--) {
-            if (buffer2[rpos] != -1)
-                return true;
+            if (buffer2[rpos] != -1) return true;
         }
         return false;
     }
