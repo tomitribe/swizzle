@@ -150,9 +150,9 @@ public class ReplaceStringInputStreamTest extends TestCase {
         in = new ReplaceStringInputStream(in, "Copyright", "Copyrizzle");
         in = new ReplaceStringInputStream(in, "public", "private");
         in = new ReplaceStringInputStream(in, "private", "public"); // Guess
-                                                                    // what will
-                                                                    // happen
-                                                                    // here
+        // what will
+        // happen
+        // here
         in = new ReplaceStringInputStream(in, "Token", "ParsedString");
         in = new ReplaceStringInputStream(in, "token", "parsedString");
         in = new ReplaceStringInputStream(in, "parent", "parentURL");
