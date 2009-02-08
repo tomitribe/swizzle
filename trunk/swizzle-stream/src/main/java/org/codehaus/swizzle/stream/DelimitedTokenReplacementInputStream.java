@@ -117,8 +117,9 @@ public class DelimitedTokenReplacementInputStream extends FilterInputStream {
             // data coming from the stream is valid, we
             // need to just keep reading till the buffer
             // gives us good data.
-            return (buffer == -1 && stream != -1) ? _read() : buffer;
-        }
+//            return (buffer == -1 && stream != -1) ? _read() : buffer;
+            return (buffer == -1 && ((stream != -1) || ( beginBuffer.hasData()))) ? _read() : buffer;
+         }
     };
 
     private int superRead() throws IOException {
