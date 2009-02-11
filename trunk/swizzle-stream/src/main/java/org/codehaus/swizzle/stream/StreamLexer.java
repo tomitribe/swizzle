@@ -18,15 +18,18 @@ package org.codehaus.swizzle.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 
 /**
  * @version $Revision$ $Date$
  */
 public class StreamLexer {
-    private final InputStream in;
+
+    private final PushbackInputStream in;
+    private ReplayInputStream mark;
 
     public StreamLexer(InputStream in) {
-        this.in = in;
+        this.in = new PushbackInputStream(in);
     }
 
     /**
@@ -38,7 +41,6 @@ public class StreamLexer {
      * 
      * Does not support regular expression matching.
      * 
-     * @deprecated Experimental, the api of this class may change
      * @param begin
      *            start token
      * @param end
@@ -47,19 +49,7 @@ public class StreamLexer {
      * @throws Exception
      */
     public String readToken(String begin, String end) throws Exception {
-        final String[] token = { null };
-        InputStream search = new DelimitedTokenReplacementInputStream(in, begin, end, new StringTokenHandler() {
-            public String handleToken(String string) throws IOException {
-                token[0] = string;
-                return string;
-            }
-        });
-
-        int i = search.read();
-        while (i != -1 && token[0] == null) {
-            i = search.read();
-        }
-        return token[0];
+        return read(begin, end);
     }
 
     /**
@@ -72,15 +62,18 @@ public class StreamLexer {
      * 
      * Does not support regular expression matching.
      * 
-     * @deprecated Experimental, the api of this class may change
      * @param string
      *            the token to find in the stream
      * @return the token if found in the stream or null if the stream was reached (i.e. the token was not found)
      * @throws Exception
      */
     public String readToken(String string) throws Exception {
+        return read(string);
+    }
+
+    public String read(String begin, String end) throws IOException {
         final String[] token = { null };
-        InputStream search = new FixedTokenReplacementInputStream(in, string, new StringTokenHandler() {
+        InputStream search = new DelimitedTokenReplacementInputStream(input(), begin, end, new StringTokenHandler() {
             public String handleToken(String string) throws IOException {
                 token[0] = string;
                 return string;
@@ -91,7 +84,108 @@ public class StreamLexer {
         while (i != -1 && token[0] == null) {
             i = search.read();
         }
+
         return token[0];
+    }
+
+    public String read(String string) throws IOException {
+        final String[] token = { null };
+        InputStream search = new FixedTokenReplacementInputStream(input(), string, new StringTokenHandler() {
+            public String handleToken(String string11) throws IOException {
+                token[0] = string11;
+                return string11;
+            }
+        });
+
+        int i = search.read();
+        while (i != -1 && token[0] == null) {
+            i = search.read();
+        }
+        return token[0];
+    }
+
+    public String seek(String begin, String end) throws IOException {
+
+        mark();
+
+        String value = read(begin, end);
+
+        if (value == null) {
+            reset();
+        } else {
+            unmark();
+        }
+
+        return value;
+    }
+
+    public String seek(String string) throws IOException {
+
+        mark();
+
+        String value = read(string);
+
+        if (value == null) {
+            reset();
+        } else {
+            unmark();
+        }
+
+        return value;
+    }
+
+    public String peek(String begin, String end) throws IOException {
+
+        mark();
+
+        String value = read(begin, end);
+
+        reset();
+
+        return value;
+    }
+
+    public String peek(String string) throws IOException {
+
+        mark();
+
+        String value = read(string);
+
+        reset();
+
+        return value;
+    }
+
+    public InputStream input() {
+        return (mark != null) ? mark: in;
+    }
+    
+    public StreamLexer mark() throws IOException {
+        return mark(null);
+    }
+
+    public void unmark() {
+        if (mark == null) return;
+        mark.reset();
+        mark = null;
+    }
+    
+    public StreamLexer mark(String limit) throws IOException {
+        if (limit != null) {
+            mark = new ReplayInputStream(in);
+        } else {
+            mark = new ReplayInputStream(new TruncateInputStream(in, limit));
+        }
+        return this;
+    }
+
+    public void reset() throws IOException {
+        if (mark == null) {
+            throw new IOException("Stream has not been marked");
+        }
+
+        in.unread(mark.getBytesRead());
+        unmark();
     }
 
 }
