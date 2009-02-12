@@ -50,22 +50,30 @@ public class StreamLexerTest extends TestCase {
         URL url = this.getClass().getClassLoader().getResource("lexer/test.xml");
         StreamLexer lexer = new StreamLexer(url.openStream());
 
+        // step into <project>
         assertNotNull(lexer.read("<project>"));
 
+        // step into <dependencies>
         assertNotNull(lexer.read("<dependencies>"));
         lexer.mark("</dependencies>");
 
+        // step into the first <dependency>
         assertNotNull(lexer.seek("<dependency>"));
         lexer.mark("</dependency>");
 
+        // read dependency information
         assertEquals("test", lexer.peek("<scope>", "</scope>"));
-        assertEquals("orange", lexer.read("<groupId>", "<groupId>"));
+        assertEquals("orange", lexer.read("<groupId>", "</groupId>"));
         assertEquals("orange-artifact", lexer.read("<artifactId>", "</artifactId>"));
-        assertNull(lexer.seek("<version>", "</version>"));
 
+        // attempt to read the version element which is not present
+        assertEquals(null, lexer.seek("<version>", "</version>"));
+
+        // step out of <dependency>
         assertNotNull(lexer.read("</dependency>"));
         lexer.unmark();
 
+        // step into the second <dependency>
         assertNull(lexer.seek("<dependency>"));
 
         assertNotNull(lexer.seek("</dependencies>"));

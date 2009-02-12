@@ -29,7 +29,7 @@ public class StreamLexer {
     private ReplayInputStream mark;
 
     public StreamLexer(InputStream in) {
-        this.in = new PushbackInputStream(in);
+        this.in = new PushbackInputStream(in, 4096 * 2);
     }
 
     /**
@@ -172,9 +172,9 @@ public class StreamLexer {
     
     public StreamLexer mark(String limit) throws IOException {
         if (limit != null) {
-            mark = new ReplayInputStream(in);
-        } else {
             mark = new ReplayInputStream(new TruncateInputStream(in, limit));
+        } else {
+            mark = new ReplayInputStream(in);
         }
         return this;
     }
