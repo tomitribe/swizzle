@@ -1,0 +1,16 @@
+<project>
+  <dependencies>
+    <dependency>
+      <groupId>organge</groupId>
+      <artifactId>orange-artifact</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>yellow</groupId>
+      <artifactId>yellow-artifact</artifactId>
+      <version>2.3</version>
+    </dependency>
+  </dependencies>
+</project>
