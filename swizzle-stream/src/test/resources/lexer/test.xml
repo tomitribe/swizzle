@@ -1,7 +1,7 @@
 <project>
   <dependencies>
     <dependency>
-      <groupId>organge</groupId>
+      <groupId>orange</groupId>
       <artifactId>orange-artifact</artifactId>
       <scope>test</scope>
     </dependency>
