@@ -181,4 +181,38 @@ public class ScanBuffer {
             buffer2[rpos] = -1;
         }
     }
+
+    public byte[] getBuffer() {
+        byte[] out = new byte[getSize()];
+        for(int i = 0; i < out.length; i++) {
+            out[i] = (byte) getByte(i);
+        }
+        return out;
+    }
+
+    /**
+     * The current size of the buffer. The number of non -1 items in the buffer.
+     */
+    private int getSize() {
+        int size = 0;
+        for (int i = 0; i < buffer.length; i++) {
+            if (getByte(i) == -1) {
+                size++;
+            } else {
+                break;
+            }
+        }
+        return size;
+    }
+
+    /**
+     * Gets the byte at the specified absolute positon
+     */
+    private int getByte(int absolutePosition) {
+        if (absolutePosition >= buffer.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        int realPosition = (pos + absolutePosition) % pos;
+        return buffer2[realPosition];
+    }
 }
