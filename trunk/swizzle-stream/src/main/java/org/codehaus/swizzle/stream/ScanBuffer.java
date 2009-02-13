@@ -212,7 +212,7 @@ public class ScanBuffer {
         if (absolutePosition >= buffer.length) {
             throw new IndexOutOfBoundsException();
         }
-        int realPosition = (pos + absolutePosition) % pos;
+        int realPosition = (pos + absolutePosition) % buffer.length;
         return buffer2[realPosition];
     }
 }
