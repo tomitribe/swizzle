@@ -16,40 +16,55 @@
  */
 package org.codehaus.swizzle.stream;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ByteArrayInputStream;
+
+import static org.codehaus.swizzle.stream.StreamUtils.join;
 
 /**
  * Reads from the underlying stream up until the token passed in.
  * After the token passed in is read, only -1 will be returned without
  * affecting the underlying stream.
- * 
+ *
  * @version $Revision$ $Date$
  */
-public class TruncateInputStream extends FilterInputStream {
+public class TruncateInputStream extends PushbackInputStream {
+    private final String endToken;
 
     private final ScanBuffer tokenBuffer;
+    private StreamReadingStrategy strategy;
 
     public TruncateInputStream(InputStream in, String end) {
         this(in, end, false);
     }
-    
-    public TruncateInputStream(InputStream in, String end, boolean caseSensitive) {
-        super(in);
+
+    public TruncateInputStream(InputStream delegate, String end, boolean caseSensitive) {
+        super(delegate);
+        if (delegate == null) throw new NullPointerException("delegate is null");
+        if (end == null) throw new NullPointerException("end is null");
+        this.endToken = end;
 
         tokenBuffer = new ScanBuffer(end, caseSensitive);
         strategy = lookingForToken;
     }
 
-    private StreamReadingStrategy strategy;
+    public String getEndToken() {
+        return endToken;
+    }
 
-    public int read() throws IOException {
+    protected int getNextByte() throws IOException {
         return strategy._read();
     }
 
-    interface StreamReadingStrategy {
+    /**
+     * Gets the current contents of the buffer
+     */
+    public byte[] getBuffer() {
+        // join the pushback buffer then the token buffer
+        return join(super.getBuffer(), tokenBuffer.getBuffer());
+    }
+
+    private interface StreamReadingStrategy {
         int _read() throws IOException;
     }
 
@@ -61,7 +76,7 @@ public class TruncateInputStream extends FilterInputStream {
 
     private final StreamReadingStrategy lookingForToken = new StreamReadingStrategy() {
         public int _read() throws IOException {
-            int stream = superRead();
+            int stream = getDelegate().read();
             int buffer = tokenBuffer.append(stream);
 
             if (tokenBuffer.match()) {
@@ -82,8 +97,4 @@ public class TruncateInputStream extends FilterInputStream {
             return i;
         }
     };
-
-    private int superRead() throws IOException {
-        return super.read();
-    }
 }

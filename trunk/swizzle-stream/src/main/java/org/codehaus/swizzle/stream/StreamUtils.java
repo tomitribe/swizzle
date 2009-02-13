@@ -40,4 +40,23 @@ public class StreamUtils {
     public static InputStream stringToStream(String original) {
         return new ByteArrayInputStream(original.getBytes());
     }
+
+    public static byte[] join(byte[]... buffers) {
+        // calculate the final size
+        int size = 0;
+        for (byte[] buffer : buffers) {
+            size += buffer.length;
+        }
+
+        // creat the output bufffer
+        byte[] out = new byte[size];
+
+        // copy each buffer into the output buffer
+        int off = 0;
+        for (byte[] buffer : buffers) {
+            System.arraycopy(buffer, 0, out, off, buffer.length);
+            off += buffer.length;
+        }
+        return out;
+    }
 }

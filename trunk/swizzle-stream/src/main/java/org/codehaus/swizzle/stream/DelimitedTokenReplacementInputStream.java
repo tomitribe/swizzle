@@ -89,6 +89,10 @@ public class DelimitedTokenReplacementInputStream extends FilterInputStream {
 
     private final DelimitedTokenReplacementInputStream.StreamReadingStrategy flushingValue = new DelimitedTokenReplacementInputStream.StreamReadingStrategy() {
         public int _read() throws IOException {
+            // todo is this correct?
+            if (value == null) {
+                return -1;
+            }
             int i = value.read();
             if (i == -1) {
                 strategy = lookingForToken;

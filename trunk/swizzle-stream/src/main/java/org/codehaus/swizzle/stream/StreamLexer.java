@@ -18,18 +18,19 @@ package org.codehaus.swizzle.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
 
 /**
  * @version $Revision$ $Date$
  */
 public class StreamLexer {
+    private static final int MARK_BUF_SIZE = 512;
 
-    private final PushbackInputStream in;
-    private ReplayInputStream mark;
+    private final InputStream delegate;
+    private PushbackInputStream in;
 
-    public StreamLexer(InputStream in) {
-        this.in = new PushbackInputStream(in, 4096 * 2);
+    public StreamLexer(InputStream delegate) {
+        this.delegate = delegate;
+        this.in = new PushbackInputStream(delegate);
     }
 
     /**
@@ -73,7 +74,7 @@ public class StreamLexer {
 
     public String read(String begin, String end) throws IOException {
         final String[] token = { null };
-        InputStream search = new DelimitedTokenReplacementInputStream(input(), begin, end, new StringTokenHandler() {
+        InputStream search = new DelimitedTokenReplacementInputStream(in, begin, end, new StringTokenHandler() {
             public String handleToken(String string) throws IOException {
                 token[0] = string;
                 return string;
@@ -90,7 +91,7 @@ public class StreamLexer {
 
     public String read(String string) throws IOException {
         final String[] token = { null };
-        InputStream search = new FixedTokenReplacementInputStream(input(), string, new StringTokenHandler() {
+        InputStream search = new FixedTokenReplacementInputStream(in, string, new StringTokenHandler() {
             public String handleToken(String string11) throws IOException {
                 token[0] = string11;
                 return string11;
@@ -106,14 +107,14 @@ public class StreamLexer {
 
     public String seek(String begin, String end) throws IOException {
 
-        mark();
+        in.mark(MARK_BUF_SIZE);
 
         String value = read(begin, end);
 
         if (value == null) {
-            reset();
+            in.reset();
         } else {
-            unmark();
+            in.unmark();
         }
 
         return value;
@@ -121,14 +122,14 @@ public class StreamLexer {
 
     public String seek(String string) throws IOException {
 
-        mark();
+        in.mark(MARK_BUF_SIZE);
 
         String value = read(string);
 
         if (value == null) {
-            reset();
+            in.reset();
         } else {
-            unmark();
+            in.unmark();
         }
 
         return value;
@@ -136,56 +137,95 @@ public class StreamLexer {
 
     public String peek(String begin, String end) throws IOException {
 
-        mark();
+        in.mark(MARK_BUF_SIZE);
 
         String value = read(begin, end);
 
-        reset();
+        in.reset();
 
         return value;
     }
 
     public String peek(String string) throws IOException {
 
-        mark();
+        in.mark(MARK_BUF_SIZE);
 
         String value = read(string);
 
-        reset();
+        in.reset();
 
         return value;
     }
 
-    public InputStream input() {
-        return (mark != null) ? mark: in;
-    }
-    
     public StreamLexer mark() throws IOException {
         return mark(null);
     }
 
     public void unmark() {
-        if (mark == null) return;
-        mark.reset();
-        mark = null;
+        if (in.getDelegate() == delegate) {
+            throw new IllegalStateException("mark has not been set");
+        }
+
+        byte[] buf = in.getBuffer();
+        in = (PushbackInputStream) in.getDelegate();
+        in.unread(buf);
     }
     
     public StreamLexer mark(String limit) throws IOException {
         if (limit != null) {
-            mark = new ReplayInputStream(new TruncateInputStream(in, limit));
+            in = new TruncateInputStream(in, limit);
         } else {
-            mark = new ReplayInputStream(in);
+            in = new PushbackInputStream(in);
         }
         return this;
     }
 
-    public void reset() throws IOException {
-        if (mark == null) {
-            throw new IOException("Stream has not been marked");
+    public boolean readAndMark(String begin, String end) throws IOException {
+        if (read(begin) != null) {
+            mark(end);
+            return true;
         }
-
-        in.unread(mark.getBytesRead());
-        unmark();
+        return false;
     }
 
+    public boolean seekAndMark(String begin, String end) throws IOException {
+        if (seek(begin) != null) {
+            mark(end);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean readAndUnmark() throws IOException {
+        // read to end tag
+        boolean found;
+        if (in instanceof TruncateInputStream) {
+            TruncateInputStream truncateInputStream = (TruncateInputStream) in;
+            found = read(truncateInputStream.getEndToken()) != null;
+        } else {
+            // no end tag, just advance to end
+            in.skip(Long.MAX_VALUE);
+            found = true;
+        }
+
+        unmark();
+
+        return found;
+    }
+
+    public boolean seekAndUnmark() throws IOException {
+        // seek to end tag
+        boolean found;
+        if (in instanceof TruncateInputStream) {
+            TruncateInputStream truncateInputStream = (TruncateInputStream) in;
+            found = seek(truncateInputStream.getEndToken()) != null;
+        } else {
+            // no end tag, so leave the cursor at the current position
+            found = true;
+        }
+
+        unmark();
+
+        return found;
+    }
 }
