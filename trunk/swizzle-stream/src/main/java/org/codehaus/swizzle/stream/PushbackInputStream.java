@@ -118,7 +118,7 @@ public class PushbackInputStream extends InputStream implements PushbackBuffer {
      */
     public void reset() {
         if (markCount > 0) {
-            pushbackBuffers.add(new PushbackBuffer(markBuffer, 0, markCount));
+            pushbackBuffers.addFirst(new PushbackBuffer(markBuffer, 0, markCount));
         }
         unmark();
     }
@@ -128,7 +128,7 @@ public class PushbackInputStream extends InputStream implements PushbackBuffer {
     }
 
     public void unread(byte[] bytes, int off, int len) {
-        pushbackBuffers.add(new PushbackBuffer(bytes, off, len));
+        pushbackBuffers.addFirst(new PushbackBuffer(bytes, off, len));
     }
 
     public byte[] getBuffer() {
@@ -179,6 +179,10 @@ public class PushbackInputStream extends InputStream implements PushbackBuffer {
             int size = size();
             System.arraycopy(buf, pos, outBuf, off, size);
             return size;
+        }
+
+        public String toString() {
+            return new String(buf, pos, end - pos);
         }
     }
 }

@@ -47,7 +47,7 @@ public class ScanBuffer {
     }
 
     public String toString() {
-        return super.toString() + "#" + getScanString() + " # buffer=" + new String(buffer);
+        return getClass().getSimpleName() + "#" + getScanString() + " # buffer[" + new String(getBuffer()) + "]";
     }
 
     public void resetPosition() {
@@ -185,7 +185,7 @@ public class ScanBuffer {
     public byte[] getBuffer() {
         byte[] out = new byte[getSize()];
         for(int i = 0; i < out.length; i++) {
-            out[i] = (byte) getByte(i);
+            out[i] = (byte) getByte(buffer.length - out.length + i);
         }
         return out;
     }
@@ -195,8 +195,9 @@ public class ScanBuffer {
      */
     private int getSize() {
         int size = 0;
-        for (int i = 0; i < buffer.length; i++) {
-            if (getByte(i) == -1) {
+        for (int i = buffer.length -1; i >= 0; i--) {
+            int b = getByte(i);
+            if (b != -1) {
                 size++;
             } else {
                 break;
