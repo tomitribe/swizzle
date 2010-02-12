@@ -22,8 +22,7 @@
   <parent>
     <artifactId>swizzle-parent</artifactId>
     <groupId>org.codehaus.swizzle</groupId>
-    <version>1-SNAPSHOT</version>
-    <relativePath>../swizzle-parent/pom.xml</relativePath>
+    <version>1</version>
   </parent>
   <groupId>org.codehaus.swizzle</groupId>
   <artifactId>swizzle-stream</artifactId>
