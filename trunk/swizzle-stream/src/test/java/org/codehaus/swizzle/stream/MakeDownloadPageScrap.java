@@ -38,11 +38,11 @@ public class MakeDownloadPageScrap extends TestCase {
 
         StreamLexer lexer = new StreamLexer(in);
 
-        lexer.readToken("Parent Directory");
+        lexer.read("Parent Directory");
 
-        while (lexer.readToken("href") != null) {
-            String link = lexer.readToken("\"", "/\"");
-            String date = lexer.readToken("</a>", " -");
+        while (lexer.read("href") != null) {
+            String link = lexer.read("\"", "/\"");
+            String date = lexer.read("</a>", " -");
             date = date.trim();
 
             System.out.println("h3. " + link);
@@ -63,11 +63,11 @@ public class MakeDownloadPageScrap extends TestCase {
 
         StreamLexer lexer = new StreamLexer(in);
 
-        lexer.readToken("Parent Directory");
+        lexer.read("Parent Directory");
 
-        while (lexer.readToken("folder.gif") != null) {
-            String link = lexer.readToken("href=\"", "/\"");
-            String date = lexer.readToken("</a>", " -");
+        while (lexer.read("folder.gif") != null) {
+            String link = lexer.read("href=\"", "/\"");
+            String date = lexer.read("</a>", " -");
             date = date.trim();
             System.out.println("* [" + link + "|" + url.toExternalForm() + "]  -  " + date);
         }
