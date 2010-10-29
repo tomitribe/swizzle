@@ -22,11 +22,12 @@
     <artifactId>swizzle-parent</artifactId>
     <groupId>org.codehaus.swizzle</groupId>
     <version>3</version>
+    <relativePath>../swizzle-parent/pom.xml</relativePath>
   </parent>
   <groupId>org.codehaus.swizzle</groupId>
   <artifactId>swizzle-stream</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>1.0.3-SNAPSHOT</version>
   <name>Swizzle :: Stream</name>
   <url>http://swizzle.codehaus.org</url>
   <dependencies>
