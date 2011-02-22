@@ -18,6 +18,7 @@ package org.codehaus.swizzle.stream;
 
 import junit.framework.TestCase;
 
+import java.io.PrintStream;
 import java.net.URL;
 import java.io.IOException;
 import java.util.HashMap;
@@ -235,4 +236,19 @@ public class StreamLexerTest extends TestCase {
         assertEquals(version, dependency.get("version"));
         assertEquals(scope, dependency.get("scope"));
     }
+
+    public void testEmptyStringRead() throws Exception {
+        URL url = this.getClass().getClassLoader().getResource("lexer/simpletext");
+        StreamLexer lexer = new StreamLexer(url.openStream());
+
+        String s = System.getProperty("line.separator");
+        
+        assertEquals("one", lexer.read("", s));
+        assertEquals("two", lexer.read("", s));
+        assertEquals("three", lexer.read("", s));
+        assertEquals("four", lexer.read("", s));
+        assertEquals("five", lexer.read("", s));
+
+    }
+
 }

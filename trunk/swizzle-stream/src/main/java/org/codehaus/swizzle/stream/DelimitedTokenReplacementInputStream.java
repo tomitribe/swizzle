@@ -104,6 +104,11 @@ public class DelimitedTokenReplacementInputStream extends FilterInputStream {
 
     private final DelimitedTokenReplacementInputStream.StreamReadingStrategy lookingForToken = new DelimitedTokenReplacementInputStream.StreamReadingStrategy() {
         public int _read() throws IOException {
+            if (beginBuffer.size() == 0) {
+                strategy = readingToken;
+                return strategy._read();
+            }
+            
             int stream = superRead();
             int buffer = beginBuffer.append(stream);
 
