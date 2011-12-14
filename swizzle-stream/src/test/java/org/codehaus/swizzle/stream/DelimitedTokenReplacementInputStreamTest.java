@@ -147,6 +147,27 @@ public class DelimitedTokenReplacementInputStreamTest extends TestCase {
         String actual = StreamUtils.streamToString(in);
 
         assertEquals(expected, actual);
+
+        // Now use a buffered method to do the same test.
+        in = StreamUtils.stringToStream(original);
+        in = new DelimitedTokenReplacementInputStream(in, begin, end, testTokenHandler);
+        actual = streamToStringChunked(in);
+
+        assertEquals(expected, actual);
+    }
+
+    private String streamToStringChunked(InputStream in) throws IOException {
+        final StringBuilder text = new StringBuilder();
+        final byte[] buf = new byte[256];
+        try {
+            int s;
+            while ((s = in.read(buf)) != -1) {
+                text.append(new String(buf, 0, s));
+            }
+        } finally {
+            in.close();
+        }
+        return text.toString();
     }
 
     private static class TestTokenHandler extends StringTokenHandler {
