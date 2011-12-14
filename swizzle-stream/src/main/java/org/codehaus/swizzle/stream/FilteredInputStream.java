@@ -1,10 +1,11 @@
 package org.codehaus.swizzle.stream;
 
 import java.io.BufferedInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class FilteredInputStream extends BufferedInputStream {
+public abstract class FilteredInputStream extends FilterInputStream {
 
     private boolean done = false;
 
