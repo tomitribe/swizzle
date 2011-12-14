@@ -16,7 +16,6 @@
  */
 package org.codehaus.swizzle.stream;
 
-import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
@@ -24,7 +23,7 @@ import java.io.ByteArrayOutputStream;
 /**
  * @version $Revision$ $Date$
  */
-public class ReplayInputStream extends FilterInputStream {
+public class ReplayInputStream extends FilteredInputStream {
     private final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
     public ReplayInputStream(InputStream in) {

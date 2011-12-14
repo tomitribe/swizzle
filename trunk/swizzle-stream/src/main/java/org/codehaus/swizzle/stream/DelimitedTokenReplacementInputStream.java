@@ -16,11 +16,10 @@
  */
 package org.codehaus.swizzle.stream;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class DelimitedTokenReplacementInputStream extends FilterInputStream {
+public class DelimitedTokenReplacementInputStream extends FilteredInputStream {
 
     private final ScanBuffer beginBuffer;
     private final ScanBuffer endBuffer;
@@ -108,7 +107,7 @@ public class DelimitedTokenReplacementInputStream extends FilterInputStream {
                 strategy = readingToken;
                 return strategy._read();
             }
-            
+
             int stream = superRead();
             int buffer = beginBuffer.append(stream);
 
@@ -127,8 +126,8 @@ public class DelimitedTokenReplacementInputStream extends FilterInputStream {
             // need to just keep reading till the buffer
             // gives us good data.
 //            return (buffer == -1 && stream != -1) ? _read() : buffer;
-            return (buffer == -1 && ((stream != -1) || ( beginBuffer.hasData()))) ? _read() : buffer;
-         }
+            return (buffer == -1 && ((stream != -1) || (beginBuffer.hasData()))) ? _read() : buffer;
+        }
     };
 
     private int superRead() throws IOException {

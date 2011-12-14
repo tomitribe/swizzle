@@ -16,11 +16,10 @@
  */
 package org.codehaus.swizzle.stream;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class IncludeFilterInputStream extends FilterInputStream {
+public class IncludeFilterInputStream extends FilteredInputStream {
 
     private final ScanBuffer beginBuffer;
     private final ScanBuffer endBuffer;

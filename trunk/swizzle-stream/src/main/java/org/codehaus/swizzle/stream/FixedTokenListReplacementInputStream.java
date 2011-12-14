@@ -17,12 +17,11 @@
 
 package org.codehaus.swizzle.stream;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public class FixedTokenListReplacementInputStream extends FilterInputStream {
+public class FixedTokenListReplacementInputStream extends FilteredInputStream {
 
     private final StreamTokenHandler handler;
     private InputStream value;
