@@ -16,6 +16,7 @@
  */
 package org.codehaus.swizzle.stream;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -67,6 +68,8 @@ public class DelimitedTokenReplacementInputStream extends FilteredInputStream {
                     // Have we just started?
                     continue;
                 } else if (buffer == -1 && stream == -1) {
+                    token.insert(0, beginBuffer.getScanString());
+                    value = new ByteArrayInputStream(token.toString().getBytes());
                     endBuffer.resetPosition();
                     strategy = flushingValue;
                     return strategy._read();
