@@ -141,6 +141,11 @@ public class DelimitedTokenReplacementInputStreamTest extends TestCase {
         swizzleAndAssert(original, expected, b, e);
     }
 
+
+    public void testUnterminatedString() throws Exception {
+        swizzleAndAssert("{hello", "{hello", "{", "}");
+    }
+
     private void swizzleAndAssert(String original, String expected, String begin, String end) throws IOException {
         InputStream in = StreamUtils.stringToStream(original);
         in = new DelimitedTokenReplacementInputStream(in, begin, end, testTokenHandler);

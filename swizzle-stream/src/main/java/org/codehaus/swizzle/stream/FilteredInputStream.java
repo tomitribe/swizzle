@@ -1,6 +1,5 @@
 package org.codehaus.swizzle.stream;
 
-import java.io.BufferedInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
