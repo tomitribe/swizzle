@@ -241,7 +241,7 @@ public class StreamLexerTest extends TestCase {
         URL url = this.getClass().getClassLoader().getResource("lexer/simpletext");
         StreamLexer lexer = new StreamLexer(url.openStream());
 
-        String s = System.getProperty("line.separator");
+        String s = "\n";
         
         assertEquals("one", lexer.read("", s));
         assertEquals("two", lexer.read("", s));
