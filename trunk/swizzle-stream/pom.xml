@@ -21,7 +21,7 @@
   <parent>
     <artifactId>swizzle</artifactId>
     <groupId>org.codehaus.swizzle</groupId>
-    <version>1.6.2</version>
+    <version>1.6.3-SNAPSHOT</version>
   </parent>
   <artifactId>swizzle-stream</artifactId>
   <name>Swizzle :: Stream</name>
