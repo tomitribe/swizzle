@@ -17,6 +17,7 @@
 package org.tomitribe.swizzle.stream;
 
 import junit.framework.TestCase;
+import org.junit.Ignore;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -25,6 +26,7 @@ import java.net.URL;
 /**
  * @version $Revision$ $Date$
  */
+@Ignore
 public class MakeDownloadPageScrap extends TestCase {
 
     public static void main(String[] args) throws Exception {

@@ -62,27 +62,37 @@ public class ExcludeFilterInputStreamTest extends TestCase {
 
         final String output = IO.slurp(in);
 
-        assertEquals("<td class=\"v-table-header-cell\" style=\"width: 65px;\">\n" +
-                "                        <div class=\"v-table-resizer\"></div>\n" +
-                "                        <div class=\"v-table-sort-indicator\"></div>\n" +
-                "                        <div class=\"v-table-caption-container v-table-caption-container-align-left\" style=\"width: 49px;\">status</div>\n" +
-                "                      </td><td class=\"v-table-header-cell\" style=\"width: 68px;\">\n" +
-                "                        <div class=\"v-table-resizer\"></div>\n" +
-                "                        <div class=\"v-table-sort-indicator\"></div>\n" +
-                "                        <div class=\"v-table-caption-container v-table-caption-container-align-left\" style=\"width: 52px;\">secure</div>\n" +
-                "                      </td><td class=\"v-table-header-cell\" style=\"width: 56px;\">\n" +
-                "                        <div class=\"v-table-resizer\"></div>\n" +
-                "                        <div class=\"v-table-sort-indicator\"></div>\n" +
-                "                        <div class=\"v-table-caption-container v-table-caption-container-align-left\" style=\"width: 40px;\">verb</div>\n" +
-                "                      </td><td class=\"v-table-header-cell\" style=\"width: 326px;\">\n" +
-                "                        <div class=\"v-table-resizer\"></div>\n" +
-                "                        <div class=\"v-table-sort-indicator\"></div>\n" +
-                "                        <div class=\"v-table-caption-container v-table-caption-container-align-left\" style=\"width: 310px;\">path</div>\n" +
-                "                      </td><td class=\"v-table-header-cell\" style=\"width: 587px;\">\n" +
-                "                        <div class=\"v-table-resizer\"></div>\n" +
-                "                        <div class=\"v-table-sort-indicator\"></div>\n" +
-                "                        <div class=\"v-table-caption-container v-table-caption-container-align-left\" style=\"width: 571px;\">summary</div>\n" +
-                "                      </td>", output);
+        assertEquals("<table>\n" +
+                "                    <tbody>\n" +
+                "                    <tr>\n" +
+                "                      <td class=\"v-table-header-cell\" style=\"width: 65px;\">\n" +
+                "                        \n" +
+                "                        \n" +
+                "                        \n" +
+                "                      </td>\n" +
+                "                      <td class=\"v-table-header-cell\" style=\"width: 68px;\">\n" +
+                "                        \n" +
+                "                        \n" +
+                "                        \n" +
+                "                      </td>\n" +
+                "                      <td class=\"v-table-header-cell\" style=\"width: 56px;\">\n" +
+                "                        \n" +
+                "                        \n" +
+                "                        \n" +
+                "                      </td>\n" +
+                "                      <td class=\"v-table-header-cell\" style=\"width: 326px;\">\n" +
+                "                        \n" +
+                "                        \n" +
+                "                        \n" +
+                "                      </td>\n" +
+                "                      <td class=\"v-table-header-cell\" style=\"width: 587px;\">\n" +
+                "                        \n" +
+                "                        \n" +
+                "                        \n" +
+                "                      </td>\n" +
+                "                    </tr>\n" +
+                "                    </tbody>\n" +
+                "                  </table>", output);
 
     }
 

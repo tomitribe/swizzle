@@ -24,12 +24,17 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     private final ScanBuffer beginBuffer;
     private final ScanBuffer endBuffer;
     private State state;
+    private boolean includeTokens;
 
     public IncludeFilterInputStream(InputStream in, String begin, String end) {
         this(in, begin, end, true);
     }
 
     public IncludeFilterInputStream(InputStream in, String begin, String end, boolean caseSensitive) {
+        this(in, begin, end, caseSensitive, true);
+    }
+
+    public IncludeFilterInputStream(InputStream in, String begin, String end, boolean caseSensitive, final boolean includeTokens) {
         super(in);
 
         beginBuffer = new ScanBuffer(begin.length());
@@ -38,7 +43,14 @@ public class IncludeFilterInputStream extends FilteredInputStream {
         beginBuffer.setScanString(begin, caseSensitive);
         endBuffer.setScanString(end, caseSensitive);
 
-        state = findBegin;
+        this.includeTokens = includeTokens;
+
+        if (includeTokens) {
+            state = findBegin;
+        } else {
+            state = findEnd;
+        }
+
     }
 
     public int read() throws IOException {
@@ -56,8 +68,7 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     private final State findBegin = new State() {
         @Override
         public int read() throws IOException {
-            int b, a = b = super$read();
-            char c = (char) b;
+            int b = super$read();
 
             while (b != -1) {
                 beginBuffer.append(b);
@@ -66,11 +77,9 @@ public class IncludeFilterInputStream extends FilteredInputStream {
                     break;
                 } else {
                     b = super$read();
-                    c = (char) b;
                 }
             }
             b = (b == -1) ? b : state.read();
-            c = (char) b;
             return b;
         }
     };
@@ -78,9 +87,10 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     private final State flushBeginToken = new State() {
         @Override
         public int read() throws IOException {
+            if (!includeTokens) beginBuffer.flush();
             final int flushed = beginBuffer.append(-1);
 
-            if (flushed != -1) {
+            if (includeTokens && flushed != -1) {
 
                 return flushed;
 
@@ -97,18 +107,15 @@ public class IncludeFilterInputStream extends FilteredInputStream {
         @Override
         public int read() throws IOException {
             int b, a = b = super$read();
-            char c = (char) b;
 
             // Look for the END token.
             // If the end token is not found.
             // Let the byte go.
             b = endBuffer.append(b);
-            c = (char) b;
             if (endBuffer.match()) {
                 state = flushEndToken;
             }
             b = (b == -1 && a != -1) ? state.read() : b;
-            c = (char) b;
             return b;
         }
     };
@@ -116,6 +123,8 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     private final State flushEndToken = new State() {
         @Override
         public int read() throws IOException {
+            if (!includeTokens) endBuffer.flush();
+
             final int flushed = endBuffer.append(-1);
 
             if (flushed != -1) {
