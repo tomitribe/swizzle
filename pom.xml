@@ -26,4 +26,49 @@
   <artifactId>swizzle</artifactId>
   <name>Swizzle :: Stream</name>
   <version>0.1-SNAPSHOT</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+     <plugins>
+       <plugin>
+         <groupId>org.apache.rat</groupId>
+         <artifactId>apache-rat-plugin</artifactId>
+         <version>0.10</version>
+         <configuration>
+           <includes>
+             <include>src/**/*</include>
+             <include>pom.xml</include>
+           </includes>
+           <excludes>
+             <exclude>src/test/resources/**/*</exclude>
+           </excludes>
+         </configuration>
+         <executions>
+           <execution>
+             <phase>validate</phase>
+             <goals>
+               <goal>check</goal>
+             </goals>
+           </execution>
+         </executions>
+       </plugin>
+
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-checkstyle-plugin</artifactId>
+         <version>${maven.checkstyle.plugin.version}</version>
+         <configuration>
+           <failOnViolation>false</failOnViolation>
+         </configuration>
+       </plugin>
+     </plugins>
+   </build>
 </project>
