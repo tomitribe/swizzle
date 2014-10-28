@@ -27,6 +27,13 @@
   <name>Swizzle :: Stream</name>
   <version>0.1-SNAPSHOT</version>
 
+  <scm>
+    <connection>scm:git:git@github.com:tomitribe/swizzle.git</connection>
+    <url>scm:git:git@github.com:tomitribe/swizzle.git</url>
+    <developerConnection>scm:git:git@github.com:tomitribe/swizzle.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
