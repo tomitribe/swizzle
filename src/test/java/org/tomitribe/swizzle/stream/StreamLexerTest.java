@@ -18,20 +18,21 @@ package org.tomitribe.swizzle.stream;
 
 import junit.framework.TestCase;
 
-import java.net.URL;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @version $Revision$ $Date$
  */
 public class StreamLexerTest extends TestCase {
 
-    public void _test() throws Exception {}
-    
+    public void _test() throws Exception {
+    }
+
     /*
     <project>
       <dependencies>
@@ -206,7 +207,7 @@ public class StreamLexerTest extends TestCase {
         List<Map<String, String>> dependencies = new ArrayList<Map<String, String>>();
 
         // step into each <dependency>
-        while(lexer.seekAndMark("<dependency>", "</dependency>")) {
+        while (lexer.seekAndMark("<dependency>", "</dependency>")) {
             dependencies.add(readDependency(lexer));
 
             // step out of <dependency>
@@ -241,7 +242,7 @@ public class StreamLexerTest extends TestCase {
         StreamLexer lexer = new StreamLexer(url.openStream());
 
         String s = "\n";
-        
+
         assertEquals("one", lexer.read("", s));
         assertEquals("two", lexer.read("", s));
         assertEquals("three", lexer.read("", s));

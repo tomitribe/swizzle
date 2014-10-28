@@ -16,9 +16,9 @@
  */
 package org.tomitribe.swizzle.stream;
 
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @version $Revision$ $Date$
@@ -32,7 +32,7 @@ public class ReplayInputStream extends FilteredInputStream {
 
     public int read() throws IOException {
         int i = super.read();
-        if (i != -1){
+        if (i != -1) {
             out.write(i);
         }
         return i;

@@ -55,7 +55,7 @@ public class Lexer {
         int pos = 0;
         Matcher matcher = null;
         // pickup where we left off
-        for (; line != null;) {
+        for (; line != null; ) {
             matcher = patterns[tokenCount][BEGIN].matcher(line);
             if (matcher.find()) {
                 line = line.substring(matcher.end());

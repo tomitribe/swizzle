@@ -13,11 +13,11 @@
  */
 package org.tomitribe.swizzle.stream;
 
-import java.util.LinkedList;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 public class PushbackInputStream extends InputStream implements PushbackBuffer {
     private final InputStream delegate;
@@ -42,7 +42,7 @@ public class PushbackInputStream extends InputStream implements PushbackBuffer {
         int next = -1;
 
         // first check the pushback buffer
-        for (Iterator<PushbackBuffer> iterator = pushbackBuffers.iterator(); iterator.hasNext();) {
+        for (Iterator<PushbackBuffer> iterator = pushbackBuffers.iterator(); iterator.hasNext(); ) {
             PushbackBuffer buffer = iterator.next();
             if (buffer.hasNext()) {
                 next = buffer.next();

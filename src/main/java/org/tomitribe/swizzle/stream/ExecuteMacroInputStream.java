@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * Really more of an example than anything else. Sky is the limit.
- * 
+ *
  * @version $Revision$ $Date$
  */
 public class ExecuteMacroInputStream extends DelimitedTokenReplacementInputStream {
