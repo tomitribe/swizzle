@@ -38,7 +38,10 @@ public class StreamLexer {
      * 
      * Given the input stream contained the sequence "123ABC456EFG"
      * 
-     * InputStream in ... StreamLexer lexer = new StreamLexer(in); String token = lexer.readToken("3","C"); // returns the string "AB" char character = (char)in.read(); // returns the character '4'
+     * InputStream in ...
+     * StreamLexer lexer = new StreamLexer(in);
+     * String token = lexer.readToken("3","C"); // returns the string "AB" char
+     * character = (char)in.read(); // returns the character '4'
      * 
      * Does not support regular expression matching.
      * 
@@ -58,7 +61,10 @@ public class StreamLexer {
      * 
      * Given the input stream contained the sequence "000[A]111[B]222[C]345[D]"
      * 
-     * InputStream in ... StreamLexer lexer = new StreamLexer(in); String token = lexer.readToken("222"); // returns the string "222" token = lexer.readToken("[", "]"); // returns the string "C" char
+     * InputStream in ...
+     * StreamLexer lexer = new StreamLexer(in);
+     * String token = lexer.readToken("222"); // returns the string "222"
+     * token = lexer.readToken("[", "]"); // returns the string "C" char
      * character = (char)in.read(); // returns the character '3'
      * 
      * Does not support regular expression matching.
