@@ -23,7 +23,7 @@ public class IncludeFilterInputStream extends FilteredInputStream {
 
     private final ScanBuffer beginBuffer;
     private final ScanBuffer endBuffer;
-    protected boolean wanted;
+    private State state;
 
     public IncludeFilterInputStream(InputStream in, String begin, String end) {
         this(in, begin, end, true);
@@ -37,39 +37,102 @@ public class IncludeFilterInputStream extends FilteredInputStream {
 
         beginBuffer.setScanString(begin, caseSensitive);
         endBuffer.setScanString(end, caseSensitive);
+
+        state = findBegin;
     }
 
     public int read() throws IOException {
+        return state.read();
+    }
 
-        int b, a = b = super.read();
-        char c = (char) b;
+    private int this$read() throws IOException {
+        return this.read();
+    }
 
-        if (wanted) {
+    private int super$read() throws IOException {
+        return super.read();
+    }
+
+    private final State findBegin = new State() {
+        @Override
+        public int read() throws IOException {
+            int b, a = b = super$read();
+            char c = (char) b;
+
+            while (b != -1) {
+                beginBuffer.append(b);
+                if (beginBuffer.match()) {
+                    state = flushBeginToken;
+                    break;
+                } else {
+                    b = super$read();
+                    c = (char) b;
+                }
+            }
+            b = (b == -1) ? b : state.read();
+            c = (char) b;
+            return b;
+        }
+    };
+
+    private final State flushBeginToken = new State() {
+        @Override
+        public int read() throws IOException {
+            final int flushed = beginBuffer.append(-1);
+
+            if (flushed != -1) {
+
+                return flushed;
+
+            } else {
+
+                state = findEnd;
+                return state.read();
+
+            }
+        }
+    };
+
+    private final State findEnd = new State() {
+        @Override
+        public int read() throws IOException {
+            int b, a = b = super$read();
+            char c = (char) b;
+
             // Look for the END token.
             // If the end token is not found.
             // Let the byte go.
             b = endBuffer.append(b);
             c = (char) b;
             if (endBuffer.match()) {
-                endBuffer.flush();
-                wanted = false;
+                state = flushEndToken;
             }
-            b = (b == -1 && a != -1) ? read() : b;
-            c = (char) b;
-            return b;
-        } else {
-            while (!wanted && b != -1) {
-                beginBuffer.append(b);
-                if (beginBuffer.match()) {
-                    wanted = true;
-                } else {
-                    b = super.read();
-                    c = (char) b;
-                }
-            }
-            b = (b == -1) ? b : read();
+            b = (b == -1 && a != -1) ? state.read() : b;
             c = (char) b;
             return b;
         }
+    };
+
+    private final State flushEndToken = new State() {
+        @Override
+        public int read() throws IOException {
+            final int flushed = endBuffer.append(-1);
+
+            if (flushed != -1) {
+
+                return flushed;
+
+            } else {
+
+                state = findBegin;
+                return state.read();
+
+            }
+        }
+    };
+
+
+    public static interface State {
+        public abstract int read() throws IOException;
     }
 }
