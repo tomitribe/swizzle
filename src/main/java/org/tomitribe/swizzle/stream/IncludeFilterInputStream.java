@@ -54,9 +54,8 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     protected final State findBegin = new State() {
         @Override
         public int read() throws IOException {
-            int b = super$read();
-
-            while (b != -1) {
+            int b;
+            while ((b = super$read()) != -1) {
                 beginBuffer.append(b);
                 if (beginBuffer.match()) {
 
@@ -66,13 +65,11 @@ public class IncludeFilterInputStream extends FilteredInputStream {
                         state = findEnd;
                     }
 
-                    break;
-                } else {
-                    b = super$read();
+                    return state.read();
                 }
             }
-            b = (b == -1) ? b : state.read();
-            return b;
+
+            return -1;
         }
     };
 
