@@ -21,12 +21,15 @@ import java.io.InputStream;
 public class ExcludeFilterInputStream extends IncludeFilterInputStream {
 
     public ExcludeFilterInputStream(InputStream in, String begin, String end) {
-        super(in, end, begin, true, false);
-        state = findEnd;
+        this(in, begin, end, true);
     }
 
-    public ExcludeFilterInputStream(InputStream in, String begin, String end, boolean caseSensitive) {
-        super(in, end, begin, caseSensitive, false);
+    public ExcludeFilterInputStream(InputStream in, String begin, String end, final boolean caseSensitive) {
+        this(in, begin, end, caseSensitive, false);
+    }
+
+    public ExcludeFilterInputStream(InputStream in, String begin, String end, final boolean caseSensitive, final boolean keepDelimiters) {
+        super(in, end, begin, caseSensitive, keepDelimiters);
         state = findEnd;
     }
 }

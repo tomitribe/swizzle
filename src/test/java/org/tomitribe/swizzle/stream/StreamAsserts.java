@@ -31,4 +31,8 @@ public class StreamAsserts {
 
         Assert.assertEquals(after, output);
     }
+
+    public static String getLargeHtml() throws IOException {
+        return IO.slurp(IncludeFilterInputStream.class.getResource("/large.html"));
+    }
 }

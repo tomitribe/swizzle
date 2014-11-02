@@ -25,6 +25,12 @@ import static org.tomitribe.swizzle.stream.StreamAsserts.assertFilter;
 
 public class IncludeFilterInputStreamTest extends Assert {
 
+    @Test
+    public void large() throws Exception {
+        final String slurp = StreamAsserts.getLargeHtml();
+
+        System.out.println(slurp);
+    }
 
     @Test
     public void defaultCaseSensitivity() throws Exception {

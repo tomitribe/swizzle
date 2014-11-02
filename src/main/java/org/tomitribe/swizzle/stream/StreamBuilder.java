@@ -40,15 +40,34 @@ public class StreamBuilder {
     }
 
     public StreamBuilder exclude(final String begin, final String end) {
-        return exclude(begin, end, true);
+        return exclude(begin, end, false, true);
     }
 
     public StreamBuilder exclude(final String begin, final String end, final boolean caseSensitive) {
-        return exclude(begin, end, caseSensitive, true);
+        return exclude(begin, end, caseSensitive, false);
     }
 
     public StreamBuilder exclude(final String begin, final String end, final boolean caseSensitive, final boolean retainDelimiters) {
         stream = new ExcludeFilterInputStream(stream, begin, end, caseSensitive, retainDelimiters);
+        return this;
+    }
+
+    public StreamBuilder delete(final String token) {
+        stream = new ReplaceStringInputStream(stream, token, "");
+        return this;
+    }
+
+    public StreamBuilder deleteBetween(final String begin, final String end, final boolean caseSensitive) {
+        return exclude(begin, end, caseSensitive, false);
+    }
+
+    public StreamBuilder deleteBetween(final String begin, final String end) {
+        stream = new ExcludeFilterInputStream(stream, begin, end, true, true);
+        return this;
+    }
+
+    public StreamBuilder replace(final String token, final String with) {
+        stream = new ReplaceStringInputStream(stream, token, with);
         return this;
     }
 
