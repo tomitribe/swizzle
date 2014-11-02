@@ -16,16 +16,86 @@
  */
 package org.tomitribe.swizzle.stream;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tomitribe.util.IO;
 
+import java.io.IOException;
 import java.io.InputStream;
 
-public class IncludeFilterInputStreamTest extends TestCase {
+public class IncludeFilterInputStreamTest extends Assert {
 
 
+    @Test
+    public void defaultCaseSensitivity() throws Exception {
+
+        assertFilter("one two three\n four five", "", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE");
+            }
+        });
+
+    }
+
+    @Test
+    public void caseSensitivity() throws Exception {
+
+        assertFilter("one two three\n four five", "three\n four five", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE", false);
+            }
+        });
+
+    }
+
+    @Test
+    public void excludeDelimiters() throws Exception {
+
+        assertFilter("one two three\n four five", "\n four ", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE", false, false);
+            }
+        });
+
+    }
+
+    @Test
+    public void beginNotFound() throws Exception {
+
+        assertFilter("one two three\n four five", "", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new IncludeFilterInputStream(inputStream, "six", "seven");
+            }
+        });
+
+    }
+
+
+    @Test
+    public void endNotFound() throws Exception {
+
+        assertFilter("one two three\n four five", "four five", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new IncludeFilterInputStream(inputStream, "four", "seven");
+            }
+        });
+
+    }
+
+    public static interface Decorator {
+        public InputStream decorate(InputStream inputStream);
+    }
+
+
+    @Test
     public void test() throws Exception {
-        final String input = "<table>\n" +
+
+        assertFilter("<table>\n" +
                 "                    <tbody>\n" +
                 "                    <tr>\n" +
                 "                      <td class=\"v-table-header-cell\" style=\"width: 65px;\">\n" +
@@ -55,13 +125,7 @@ public class IncludeFilterInputStreamTest extends TestCase {
                 "                      </td>\n" +
                 "                    </tr>\n" +
                 "                    </tbody>\n" +
-                "                  </table>";
-
-        final InputStream in = new IncludeFilterInputStream(IO.read(input), "<td", "</td>");
-
-        final String output = IO.slurp(in);
-
-        assertEquals("<td class=\"v-table-header-cell\" style=\"width: 65px;\">\n" +
+                "                  </table>", "<td class=\"v-table-header-cell\" style=\"width: 65px;\">\n" +
                 "                        <div class=\"v-table-resizer\"></div>\n" +
                 "                        <div class=\"v-table-sort-indicator\"></div>\n" +
                 "                        <div class=\"v-table-caption-container v-table-caption-container-align-left\" style=\"width: 49px;\">status</div>\n" +
@@ -81,8 +145,22 @@ public class IncludeFilterInputStreamTest extends TestCase {
                 "                        <div class=\"v-table-resizer\"></div>\n" +
                 "                        <div class=\"v-table-sort-indicator\"></div>\n" +
                 "                        <div class=\"v-table-caption-container v-table-caption-container-align-left\" style=\"width: 571px;\">summary</div>\n" +
-                "                      </td>", output);
+                "                      </td>", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new IncludeFilterInputStream(inputStream, "<td", "</td>");
+            }
+        });
 
+    }
+
+    private void assertFilter(final String before, final String after, Decorator decorator) throws IOException {
+
+        final InputStream read = decorator.decorate(IO.read(before));
+
+        final String output = IO.slurp(read);
+
+        assertEquals(after, output);
     }
 
 

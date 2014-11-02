@@ -23,7 +23,7 @@ public class IncludeFilterInputStream extends FilteredInputStream {
 
     private final ScanBuffer beginBuffer;
     private final ScanBuffer endBuffer;
-    private State state;
+    protected State state;
     private boolean keepDelimiters;
 
     public IncludeFilterInputStream(InputStream in, String begin, String end) {
@@ -37,35 +37,21 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     public IncludeFilterInputStream(InputStream in, String begin, String end, boolean caseSensitive, final boolean keepDelimiters) {
         super(in);
 
-        beginBuffer = new ScanBuffer(begin.length());
-        endBuffer = new ScanBuffer(end.length());
-
-        beginBuffer.setScanString(begin, caseSensitive);
-        endBuffer.setScanString(end, caseSensitive);
-
+        this.beginBuffer = new ScanBuffer(begin, caseSensitive);
+        this.endBuffer = new ScanBuffer(end, caseSensitive);
         this.keepDelimiters = keepDelimiters;
-
-        if (keepDelimiters) {
-            state = findBegin;
-        } else {
-            state = findEnd;
-        }
-
+        this.state = findBegin;
     }
 
     public int read() throws IOException {
         return state.read();
     }
 
-    private int this$read() throws IOException {
-        return this.read();
-    }
-
     private int super$read() throws IOException {
         return super.read();
     }
 
-    private final State findBegin = new State() {
+    protected final State findBegin = new State() {
         @Override
         public int read() throws IOException {
             int b = super$read();
@@ -75,7 +61,7 @@ public class IncludeFilterInputStream extends FilteredInputStream {
                 if (beginBuffer.match()) {
 
                     if (keepDelimiters) {
-                        state = flushBeginToken;
+                        state = writeBeginBuffer;
                     } else {
                         state = findEnd;
                     }
@@ -90,15 +76,14 @@ public class IncludeFilterInputStream extends FilteredInputStream {
         }
     };
 
-    private final State flushBeginToken = new State() {
+    protected final State writeBeginBuffer = new State() {
         @Override
         public int read() throws IOException {
-            if (!keepDelimiters) beginBuffer.flush();
-            final int flushed = beginBuffer.append(-1);
+            final int b = beginBuffer.append(-1);
 
-            if (keepDelimiters && flushed != -1) {
+            if (b != -1) {
 
-                return flushed;
+                return b;
 
             } else {
 
@@ -109,7 +94,7 @@ public class IncludeFilterInputStream extends FilteredInputStream {
         }
     };
 
-    private final State findEnd = new State() {
+    protected final State findEnd = new State() {
         @Override
         public int read() throws IOException {
             int b, a = b = super$read();
@@ -119,9 +104,13 @@ public class IncludeFilterInputStream extends FilteredInputStream {
             // Let the byte go.
             b = endBuffer.append(b);
             if (endBuffer.match()) {
+
                 if (keepDelimiters) {
-                    state = flushEndToken;
+
+                    state = writeEndBuffer;
+
                 } else {
+
                     endBuffer.flush();
                     state = findBegin;
                 }
@@ -131,16 +120,14 @@ public class IncludeFilterInputStream extends FilteredInputStream {
         }
     };
 
-    private final State flushEndToken = new State() {
+    protected final State writeEndBuffer = new State() {
         @Override
         public int read() throws IOException {
-            if (!keepDelimiters) endBuffer.flush();
+            final int b = endBuffer.append(-1);
 
-            final int flushed = endBuffer.append(-1);
+            if (b != -1) {
 
-            if (flushed != -1) {
-
-                return flushed;
+                return b;
 
             } else {
 
@@ -150,9 +137,4 @@ public class IncludeFilterInputStream extends FilteredInputStream {
             }
         }
     };
-
-
-    public static interface State {
-        public abstract int read() throws IOException;
-    }
 }

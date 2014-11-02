@@ -22,9 +22,11 @@ public class ExcludeFilterInputStream extends IncludeFilterInputStream {
 
     public ExcludeFilterInputStream(InputStream in, String begin, String end) {
         super(in, end, begin, true, false);
+        state = findEnd;
     }
 
     public ExcludeFilterInputStream(InputStream in, String begin, String end, boolean caseSensitive) {
         super(in, end, begin, caseSensitive, false);
+        state = findEnd;
     }
 }
