@@ -54,9 +54,8 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     protected final State findBegin = new State() {
         @Override
         public int read() throws IOException {
-            int b = super$read();
-
-            while (b != -1) {
+            int b;
+            while ((b=super$read()) != -1) {
                 beginBuffer.append(b);
                 if (beginBuffer.match()) {
 
@@ -66,32 +65,23 @@ public class IncludeFilterInputStream extends FilteredInputStream {
                         beginBuffer.flush();
                         state = findEnd;
                     }
-                    break;
-                } else {
-                    b = super$read();
+                    return state.read();
                 }
             }
-            b = (b == -1) ? b : state.read();
-            return b;
+
+            return -1;
         }
     };
 
     protected final State flushBeginToken = new State() {
         @Override
         public int read() throws IOException {
-            if (!keepDelimiters) beginBuffer.flush();
             final int flushed = beginBuffer.append(-1);
 
-            if (keepDelimiters && flushed != -1) {
+            if (flushed != -1) return flushed;
 
-                return flushed;
-
-            } else {
-
-                state = findEnd;
-                return state.read();
-
-            }
+            state = findEnd;
+            return state.read();
         }
     };
 
@@ -122,16 +112,10 @@ public class IncludeFilterInputStream extends FilteredInputStream {
         public int read() throws IOException {
             final int flushed = endBuffer.append(-1);
 
-            if (flushed != -1) {
+            if (flushed != -1) return flushed;
 
-                return flushed;
-
-            } else {
-
-                state = findBegin;
-                return state.read();
-
-            }
+            state = findBegin;
+            return state.read();
         }
     };
 }
