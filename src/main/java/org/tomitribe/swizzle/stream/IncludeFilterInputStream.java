@@ -37,28 +37,15 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     public IncludeFilterInputStream(InputStream in, String begin, String end, boolean caseSensitive, final boolean includeTokens) {
         super(in);
 
-        beginBuffer = new ScanBuffer(begin.length());
-        endBuffer = new ScanBuffer(end.length());
-
-        beginBuffer.setScanString(begin, caseSensitive);
-        endBuffer.setScanString(end, caseSensitive);
+        beginBuffer = new ScanBuffer(begin, caseSensitive);
+        endBuffer = new ScanBuffer(end, caseSensitive);
 
         this.includeTokens = includeTokens;
-
-        if (includeTokens) {
-            state = findBegin;
-        } else {
-            state = findEnd;
-        }
-
+        this.state = findBegin;
     }
 
     public int read() throws IOException {
         return state.read();
-    }
-
-    private int this$read() throws IOException {
-        return this.read();
     }
 
     private int super$read() throws IOException {
@@ -139,9 +126,4 @@ public class IncludeFilterInputStream extends FilteredInputStream {
             }
         }
     };
-
-
-    public static interface State {
-        public abstract int read() throws IOException;
-    }
 }
