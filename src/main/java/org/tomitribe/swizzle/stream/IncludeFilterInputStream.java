@@ -88,12 +88,15 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     protected final State findEnd = new State() {
         @Override
         public int read() throws IOException {
-            final int read = super$read();
-            final int buffered = endBuffer.append(read);
 
-            if (buffered == -1) {
-                if (read == -1) return -1; // end of stream
-                else return state.read(); // buffer more
+            // read till we've buffered enough to check for a match
+            int buffered;
+            while (true) {
+                final int streamed = super$read();
+                buffered = endBuffer.append(streamed);
+
+                if (buffered != -1) break;
+                if (streamed == -1) return -1; // end of stream
             }
 
             if (endBuffer.match()) {
