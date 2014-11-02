@@ -24,7 +24,7 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     private final ScanBuffer beginBuffer;
     private final ScanBuffer endBuffer;
     protected State state;
-    private boolean includeTokens;
+    private boolean keepDelimiters;
 
     public IncludeFilterInputStream(InputStream in, String begin, String end) {
         this(in, begin, end, true);
@@ -34,13 +34,12 @@ public class IncludeFilterInputStream extends FilteredInputStream {
         this(in, begin, end, caseSensitive, true);
     }
 
-    public IncludeFilterInputStream(InputStream in, String begin, String end, boolean caseSensitive, final boolean includeTokens) {
+    public IncludeFilterInputStream(InputStream in, String begin, String end, boolean caseSensitive, final boolean keepDelimiters) {
         super(in);
 
-        beginBuffer = new ScanBuffer(begin, caseSensitive);
-        endBuffer = new ScanBuffer(end, caseSensitive);
-
-        this.includeTokens = includeTokens;
+        this.beginBuffer = new ScanBuffer(begin, caseSensitive);
+        this.endBuffer = new ScanBuffer(end, caseSensitive);
+        this.keepDelimiters = keepDelimiters;
         this.state = findBegin;
     }
 
@@ -60,7 +59,13 @@ public class IncludeFilterInputStream extends FilteredInputStream {
             while (b != -1) {
                 beginBuffer.append(b);
                 if (beginBuffer.match()) {
-                    state = flushBeginToken;
+
+                    if (keepDelimiters) {
+                        state = flushBeginToken;
+                    } else {
+                        beginBuffer.flush();
+                        state = findEnd;
+                    }
                     break;
                 } else {
                     b = super$read();
@@ -74,10 +79,10 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     protected final State flushBeginToken = new State() {
         @Override
         public int read() throws IOException {
-            if (!includeTokens) beginBuffer.flush();
+            if (!keepDelimiters) beginBuffer.flush();
             final int flushed = beginBuffer.append(-1);
 
-            if (includeTokens && flushed != -1) {
+            if (keepDelimiters && flushed != -1) {
 
                 return flushed;
 
@@ -100,7 +105,12 @@ public class IncludeFilterInputStream extends FilteredInputStream {
             // Let the byte go.
             b = endBuffer.append(b);
             if (endBuffer.match()) {
-                state = flushEndToken;
+                if (keepDelimiters) {
+                    state = flushEndToken;
+                } else {
+                    endBuffer.flush();
+                    state = findBegin;
+                }
             }
             b = (b == -1 && a != -1) ? state.read() : b;
             return b;
@@ -110,8 +120,6 @@ public class IncludeFilterInputStream extends FilteredInputStream {
     protected final State flushEndToken = new State() {
         @Override
         public int read() throws IOException {
-            if (!includeTokens) endBuffer.flush();
-
             final int flushed = endBuffer.append(-1);
 
             if (flushed != -1) {
