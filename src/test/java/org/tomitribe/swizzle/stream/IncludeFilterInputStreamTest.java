@@ -21,13 +21,15 @@ import org.junit.Test;
 
 import java.io.InputStream;
 
+import static org.tomitribe.swizzle.stream.StreamAsserts.assertFilter;
+
 public class IncludeFilterInputStreamTest extends Assert {
 
 
     @Test
     public void defaultCaseSensitivity() throws Exception {
 
-        StreamAsserts.assertFilter("one two three\n four five", "", new Decorator() {
+        assertFilter("one two three\n four five", "", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE");
@@ -39,7 +41,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void caseSensitivity() throws Exception {
 
-        StreamAsserts.assertFilter("one two three\n four five", "three\n four five", new Decorator() {
+        assertFilter("one two three\n four five", "three\n four five", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE", false);
@@ -51,7 +53,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void excludeDelimiters() throws Exception {
 
-        StreamAsserts.assertFilter("one two three\n four five", "\n four ", new Decorator() {
+        assertFilter("one two three\n four five", "\n four ", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE", false, false);
@@ -63,7 +65,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void beginNotFound() throws Exception {
 
-        StreamAsserts.assertFilter("one two three\n four five", "", new Decorator() {
+        assertFilter("one two three\n four five", "", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "six", "seven");
@@ -76,7 +78,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void endNotFound() throws Exception {
 
-        StreamAsserts.assertFilter("one two three\n four five", "four five", new Decorator() {
+        assertFilter("one two three\n four five", "four five", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "four", "seven");
@@ -89,7 +91,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void test() throws Exception {
 
-        StreamAsserts.assertFilter("<table>\n" +
+        assertFilter("<table>\n" +
                 "                    <tbody>\n" +
                 "                    <tr>\n" +
                 "                      <td class=\"v-table-header-cell\" style=\"width: 65px;\">\n" +
