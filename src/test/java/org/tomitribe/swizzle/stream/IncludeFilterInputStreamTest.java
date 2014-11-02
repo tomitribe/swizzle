@@ -18,9 +18,7 @@ package org.tomitribe.swizzle.stream;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.tomitribe.util.IO;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 public class IncludeFilterInputStreamTest extends Assert {
@@ -29,7 +27,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void defaultCaseSensitivity() throws Exception {
 
-        assertFilter("one two three\n four five", "", new Decorator() {
+        StreamAsserts.assertFilter("one two three\n four five", "", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE");
@@ -41,7 +39,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void caseSensitivity() throws Exception {
 
-        assertFilter("one two three\n four five", "three\n four five", new Decorator() {
+        StreamAsserts.assertFilter("one two three\n four five", "three\n four five", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE", false);
@@ -53,7 +51,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void excludeDelimiters() throws Exception {
 
-        assertFilter("one two three\n four five", "\n four ", new Decorator() {
+        StreamAsserts.assertFilter("one two three\n four five", "\n four ", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE", false, false);
@@ -65,7 +63,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void beginNotFound() throws Exception {
 
-        assertFilter("one two three\n four five", "", new Decorator() {
+        StreamAsserts.assertFilter("one two three\n four five", "", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "six", "seven");
@@ -78,7 +76,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void endNotFound() throws Exception {
 
-        assertFilter("one two three\n four five", "four five", new Decorator() {
+        StreamAsserts.assertFilter("one two three\n four five", "four five", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "four", "seven");
@@ -87,15 +85,11 @@ public class IncludeFilterInputStreamTest extends Assert {
 
     }
 
-    public static interface Decorator {
-        public InputStream decorate(InputStream inputStream);
-    }
-
 
     @Test
     public void test() throws Exception {
 
-        assertFilter("<table>\n" +
+        StreamAsserts.assertFilter("<table>\n" +
                 "                    <tbody>\n" +
                 "                    <tr>\n" +
                 "                      <td class=\"v-table-header-cell\" style=\"width: 65px;\">\n" +
@@ -153,15 +147,4 @@ public class IncludeFilterInputStreamTest extends Assert {
         });
 
     }
-
-    private void assertFilter(final String before, final String after, Decorator decorator) throws IOException {
-
-        final InputStream read = decorator.decorate(IO.read(before));
-
-        final String output = IO.slurp(read);
-
-        assertEquals(after, output);
-    }
-
-
 }
