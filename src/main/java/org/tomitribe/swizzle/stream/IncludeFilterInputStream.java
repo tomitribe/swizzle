@@ -55,7 +55,7 @@ public class IncludeFilterInputStream extends FilteredInputStream {
         @Override
         public int read() throws IOException {
             int b;
-            while ((b=super$read()) != -1) {
+            while ((b = super$read()) != -1) {
                 beginBuffer.append(b);
                 if (beginBuffer.match()) {
 
@@ -94,6 +94,9 @@ public class IncludeFilterInputStream extends FilteredInputStream {
             // If the end token is not found.
             // Let the byte go.
             b = endBuffer.append(b);
+
+            if (b == -1 && a == -1) return -1;
+
             if (endBuffer.match()) {
                 if (keepDelimiters) {
                     state = flushEndToken;
@@ -102,8 +105,7 @@ public class IncludeFilterInputStream extends FilteredInputStream {
                     state = findBegin;
                 }
             }
-            b = (b == -1 && a != -1) ? state.read() : b;
-            return b;
+            return (b == -1) ? state.read() : b;
         }
     };
 
