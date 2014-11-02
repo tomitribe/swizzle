@@ -78,28 +78,24 @@ public class IncludeFilterInputStream extends FilteredInputStream {
         public int read() throws IOException {
             final int b = beginBuffer.append(-1);
 
-            if (b != -1) {
+            if (b != -1) return b;
 
-                return b;
-
-            } else {
-
-                state = findEnd;
-                return state.read();
-
-            }
+            state = findEnd;
+            return state.read();
         }
     };
 
     protected final State findEnd = new State() {
         @Override
         public int read() throws IOException {
-            int b, a = b = super$read();
+            final int read = super$read();
+            final int buffered = endBuffer.append(read);
 
-            // Look for the END token.
-            // If the end token is not found.
-            // Let the byte go.
-            b = endBuffer.append(b);
+            if (buffered == -1) {
+                if (read == -1) return -1; // end of stream
+                else return state.read(); // buffer more
+            }
+
             if (endBuffer.match()) {
 
                 if (keepDelimiters) {
@@ -112,8 +108,8 @@ public class IncludeFilterInputStream extends FilteredInputStream {
                     state = findBegin;
                 }
             }
-            b = (b == -1 && a != -1) ? state.read() : b;
-            return b;
+
+            return buffered;
         }
     };
 
@@ -122,16 +118,10 @@ public class IncludeFilterInputStream extends FilteredInputStream {
         public int read() throws IOException {
             final int b = endBuffer.append(-1);
 
-            if (b != -1) {
+            if (b != -1) return b;
 
-                return b;
-
-            } else {
-
-                state = findBegin;
-                return state.read();
-
-            }
+            state = findBegin;
+            return state.read();
         }
     };
 }
