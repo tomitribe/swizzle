@@ -29,7 +29,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void defaultCaseSensitivity() throws Exception {
 
-        assertFilter("one two three\n four five", "", new Decorator() {
+        assertFilter("one two three\n four fiveone two three\n four five", "", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE");
@@ -41,7 +41,8 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void caseSensitivity() throws Exception {
 
-        assertFilter("one two three\n four five", "three\n four five", new Decorator() {
+        assertFilter("one two three\n four fiveone two three\n four five", "three\n four fivethree\n" +
+                " four five", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE", false);
@@ -53,7 +54,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void excludeDelimiters() throws Exception {
 
-        assertFilter("one two three\n four five", "\n four ", new Decorator() {
+        assertFilter("one two three\n four fiveone two three\n four five", "\n four \n four ", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "ThRee", "fIvE", false, false);
@@ -65,7 +66,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void beginNotFound() throws Exception {
 
-        assertFilter("one two three\n four five", "", new Decorator() {
+        assertFilter("one two three\n four fiveone two three\n four five", "", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "six", "seven");
@@ -78,7 +79,7 @@ public class IncludeFilterInputStreamTest extends Assert {
     @Test
     public void endNotFound() throws Exception {
 
-        assertFilter("one two three\n four five", "four five", new Decorator() {
+        assertFilter("one two three\n four fiveone two three\n four five", "four fiveone two three\n four five", new Decorator() {
             @Override
             public InputStream decorate(InputStream inputStream) {
                 return new IncludeFilterInputStream(inputStream, "four", "seven");

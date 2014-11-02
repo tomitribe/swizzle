@@ -17,14 +17,89 @@
 package org.tomitribe.swizzle.stream;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.tomitribe.util.IO;
 
 import java.io.InputStream;
 
-public class ExcludeFilterInputStreamTest extends TestCase {
+import static org.tomitribe.swizzle.stream.StreamAsserts.assertFilter;
 
-    @Ignore
+public class ExcludeFilterInputStreamTest extends Assert {
+
+    
+    @Test
+    public void defaultCaseSensitivity() throws Exception {
+
+        assertFilter(
+                "one two three\n four fiveone two three\n four five",
+                "one two three\n four fiveone two three\n" +
+                " four five", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new ExcludeFilterInputStream(inputStream, "ThRee", "fIvE");
+            }
+        });
+
+    }
+
+    @Test
+    public void caseSensitivity() throws Exception {
+
+        assertFilter(
+                "one two three\n four fiveone two three\n four five", "one two one two ", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new ExcludeFilterInputStream(inputStream, "ThRee", "fIvE", false);
+            }
+        });
+
+    }
+
+    @Test
+    public void excludeDelimiters() throws Exception {
+
+        assertFilter("one two three\n four fiveone two three\n four five", "one two threefiveone two threefive", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new ExcludeFilterInputStream(inputStream, "ThRee", "fIvE", false, true);
+            }
+        });
+
+    }
+
+    @Test
+    public void beginNotFound() throws Exception {
+
+        assertFilter(
+                "one two three\n four fiveone two three\n four five",
+                "one two three\n four fiveone two three\n four five", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new ExcludeFilterInputStream(inputStream, "six", "seven");
+            }
+        });
+
+    }
+
+
+    @Test
+    public void endNotFound() throws Exception {
+
+        assertFilter(
+                "one two three\n four fiveone two three\n four five",
+                "one two three\n ", new Decorator() {
+            @Override
+            public InputStream decorate(InputStream inputStream) {
+                return new ExcludeFilterInputStream(inputStream, "four", "seven");
+            }
+        });
+
+    }
+
+    
+
     public void test() throws Exception {
         final String input = "<table>\n" +
                 "                    <tbody>\n" +
