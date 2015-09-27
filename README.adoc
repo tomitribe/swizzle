@@ -1,0 +1,275 @@
+# Swizzle Stream
+
+Swizzle stream is pretty nice for finding/manipulating data in streams. It consists of two approaches:
+
+- Stream filters - wrap and rewrap input streams with input stream filters that can add/remove/replace data as it's read from the stream.
+- Stream lexer - variation of the above approach but with the stream details hidden exposing only 'String readToken(...)' methods to pull only desired data from a stream.
+One limitation is that it does not support regular expressions. All tokens are treated as string literals which keeps the searching/scanning very fast and efficient as we only need to buffer and compare a known and fixed amount of data while reading each new byte of a stream.
+
+## Filters
+
+### Include/Exclude
+
+The first set of filters simply include or exclude all data between two tokens in the stream.
+
+- IncludeFilterInputStream
+- ExcludeFilterInputStream
+
+For example if you wanted to read in an html document and include only the body, but you also want to exclude any html comments or script elements you could do the following:
+
+[source,java]
+----
+URL url = new URL("/web/20140620195528/http://somewhere.com/foo/bar.html");
+InputStream in = new BufferedInputStream(url.openStream());
+
+// Include only the body
+in = new IncludeFilterInputStream(in, "<BODY", "</BODY>");
+
+// Exclude any comments
+in = new ExcludeFilterInputStream(in, "<!--", "-->");
+
+// Exclude any script sections
+in = new ExcludeFilterInputStream(in, "<SCRIPT", "</SCRIPT>");
+
+try {
+    int b;
+    while ((b = in.read()) != -1) {
+        System.out.print((char) b);
+    }
+} finally {
+    in.close();
+}
+----
+
+## Replacement
+
+There are three basic strategies for replacing a chunk of text (called a token) from a stream.
+
+- FixedTokenReplacementInputStream - find A, replace with X
+- FixedTokenListReplacementInputStream - find A or B or C..., replace with X
+- DelimitedTokenReplacementInputStream - find A read until B, replace with X
+
+The value X is supplied by you through implementing this interface:
+
+
+[source,java]
+----
+public interface StreamTokenHandler {
+    public InputStream processToken(String token) throws IOException;
+}
+----
+
+This was done so that X could also be a stream keeping the library true to it's endless tiker-tape philosophy. The value of X could be a 10 GB file on disk if you desired. There are a couple of standard implementations of StreamTokenHandler:
+
+- StringTokenHandler - constructed with a String which is simply passed back on each processToken(token) call. Solves a common case where X is simply a String.
+- MappedTokenHandler - constructed with a Map of String key/value pairs. On each processToken(token) call the handler will lookup the token in the map and return the corresponding value's toString() result. Solves the case where X should be different based on the what the token is.
+
+These are trivial implementations and much more powerful replacements could be done with little effort. For example, here is a DelimitedTokenReplacementInputStream subclass (included in swizzle-stream) with it's own implementation of StreamTokenHandler which can resolve relative URLs to be absolute URLs.
+
+
+[source,java]
+----
+package org.codehaus.swizzle.stream;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
+public class ResolveUrlInputStream extends DelimitedTokenReplacementInputStream {
+
+    public ResolveUrlInputStream(InputStream in, String begin, String end, URL url) {
+        super(in, begin, end, new UrlResolver(begin, end, url), false);
+    }
+
+    public static class UrlResolver extends StringTokenHandler {
+        private final URL parent;
+        private final String begin;
+        private final String end;
+
+        public UrlResolver(String begin, String end, URL parent) {
+            this.begin = begin;
+            this.end = end;
+            this.parent = parent;
+        }
+
+        public String handleToken(String token) throws IOException {
+            String cleanedToken = token.replaceAll("[ \"\']", "");
+            URL newURL = new URL(parent, cleanedToken);
+
+            StringBuffer link = new StringBuffer();
+            link.append(begin.toLowerCase());
+            if (!begin.endsWith("\"")) {
+                link.append('\"');
+            }
+
+            link.append(newURL.toExternalForm());
+
+            if (!end.startsWith("\"")) {
+                link.append('\"');
+            }
+            link.append(end);
+
+            return link.toString();
+        }
+    }
+}
+----
+
+You could use the above class as follows:
+
+
+[source,java]
+----
+URL url = new URL("/web/20140620195528/http://somewhere.com/foo/bar.html");
+InputStream in = new BufferedInputStream(url.openStream());
+
+// Resolve all links relative to the "/web/20140620195528/http://somewhere.com/foo/bar.html" url
+in = new ResolveUrlInputStream(in, "<A HREF=", ">", url);
+
+// Resolve all img src links relative to the "/web/20140620195528/http://somewhere.com/foo/bar.html" url
+in = new ResolveUrlInputStream(in, "SRC=\"", "\"", url);
+
+try {
+    int b;
+    while ((b = in.read()) != -1) {
+        System.out.print((char) b);
+    }
+} finally {
+    in.close();
+}
+----
+
+### Convenience subclasses
+
+For convenience, there are subclasses of the above replacement filters that incorporate the various handlers. They are:
+
+ - `ResolveUrlInputStream(InputStream in, String begin, String end, URL url)`. Shown above.
+ - `ReplaceVariablesInputStream(InputStream in, String begin, String end, Map variables)`. This one extends DelimitedTokenReplacementInputStream and uses the MappedTokenHandler allowing you to specify a set of delimiters to look for, say "${" and "}", then pass in a map of key/value pairs to replace what is found between the delimiters in the stream.
+ - `ReplaceStringsInputStream(InputStream in, Map tokenMap)`. A subclass of FixedTokenListReplacementInputStream also incorporating the MappedTokenHandler. The keys in the tokenMap are used to create the fixed list of tokens we will search for and the values of course will be used when each token is found.
+ - `ReplaceStringInputStream(InputStream in, String token, String fixedValue)`. A subclass of FixedTokenReplacementInputStream using the StringTokenHandler to do a straight A for B string replacement.
+
+## Lexer
+
+Under the covers the lexer is just using the above mentioned filters to achieve its results, however thinking in "stream wrapping" can make your brain hurt after a while. Often you have a specific grammar you are after and simply want an easy way to chop tokens out of the stream.
+
+The lexer has two methods:
+
+- String readToken(String token)
+- String readToken(String begin, String end)
+
+### readToken(token)
+
+Seeks in the stream till it finds the start token, reads into a buffer till it finds the end token, then
+
+returns the token (the buffer) as a String.
+
+Given the input stream contained the sequence "123ABC456EFG"
+
+[source,java]
+----
+InputStream in ...
+StreamLexer lexer = new StreamLexer(in);
+String token = lexer.readToken("3","C"); // returns the string "AB"
+char character = (char)in.read(); // returns the character '4'
+----
+
+
+### readToken(begin, end)
+
+Seeks in the stream till it finds and has completely read the token, then stops.
+
+Useful for seeking up to a certain point in the stream.
+
+Given the input stream contained the sequence "000[A]111[B]222[C]345[D]"
+
+[source,java]
+----
+InputStream in ...
+StreamLexer lexer = new StreamLexer(in);
+String token = lexer.readToken("222"); // returns the string "222"
+token = lexer.readToken("[", "]"); // returns the string "C"
+char character = (char)in.read(); // returns the character '3'
+----
+
+### Lexer Example
+
+Here's a chunk of code I whipped up recently after seeing standup comic at a local restaurant. Couldn't remember his name but definitely remembered seeing him on Comedy Central. Swizzle stream to the rescue .. it was a piece of cake write something that would download the picture of every comedian in Comedy Central list of comedians A-Z. (yes, the style and exception handling of this code is terrible ... such is the way of "write once, never use again" code)
+
+[source,java]
+----
+import org.codehaus.swizzle.stream.StreamLexer;
+
+import java.net.URL;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+
+public class FindComedians {
+
+    public static void main(String[] args) throws Exception {
+        String[] list = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
+
+        for (String s : list) {
+            URL url = new URL("/web/20140620195528/http://www.comedycentral.com/comedians/browse/" + s + "/index.jhtml");
+
+            BufferedInputStream in = new BufferedInputStream(url.openStream());
+            StreamLexer lexer = new StreamLexer(in);
+
+            if (lexer.readToken("bioTextArea_partialScroll") != null) {
+                String comedian = null;
+                while ((comedian = lexer.readToken("<a href=\"/comedians/browse", "\"")) != null) {
+                    try {
+                        comedian(new URL(url, "/comedians/browse" + comedian), comedian);
+                    } catch (Exception e) {
+                        System.out.println("Failed: " + e.getMessage());
+                    }
+                }
+
+            }
+        }
+    }
+
+    private static void comedian(URL url, String comedian) throws Exception {
+        comedian = comedian.replaceFirst(".*/","");
+        comedian = comedian.replaceFirst("jhtml$","jpg");
+
+        System.out.println(comedian);
+
+        BufferedInputStream in = new BufferedInputStream(url.openStream());
+        StreamLexer lexer = new StreamLexer(in);
+
+        if (lexer.readToken("bioTextArea_partialScroll") == null) fail(comedian, "part1.");
+
+        if (lexer.readToken("scrollCenter") == null) fail(comedian, "part2.");
+
+        String img = lexer.readToken("<img src=\"", "\">");
+
+        if (img == null) fail(comedian, "no img url.");
+
+        download(new URL(url, img), comedian);
+    }
+
+    private static void download(URL url, String comedian) throws Exception {
+        BufferedInputStream in = new BufferedInputStream(url.openStream());
+
+        File file = new File("/tmp/comedians");
+        file = new File(file, comedian);
+
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+
+        int i = in.read();
+        while (i != -1){
+            out.write(i);
+            i = in.read();
+        }
+
+        out.close();
+        in.close();
+    }
+
+    private static void fail(String comedian, String message) throws Exception {
+        throw new Exception(comedian+" - "+ message);
+    }
+}
+----
