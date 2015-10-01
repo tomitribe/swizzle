@@ -1,4 +1,5 @@
-# Swizzle Stream
+= Swizzle Stream
+:showtitle:
 
 Swizzle stream is pretty nice for finding/manipulating data in streams. It consists of two approaches:
 
