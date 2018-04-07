@@ -81,6 +81,7 @@ public class ScanBuffer {
     }
 
     public int append(int newByte) {
+        if(token.length == 0) return newByte;
         int old = buffer2[pos];
 
         buffer2[pos] = newByte;

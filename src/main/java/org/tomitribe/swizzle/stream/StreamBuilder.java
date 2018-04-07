@@ -16,14 +16,19 @@
  */
 package org.tomitribe.swizzle.stream;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class StreamBuilder {
 
-    private InputStream stream;
+    private InputStream in;
 
-    public StreamBuilder(InputStream stream) {
-        this.stream = stream;
+    public StreamBuilder(InputStream in) {
+        this.in = in;
     }
 
     public StreamBuilder include(final String begin, final String end) {
@@ -35,7 +40,7 @@ public class StreamBuilder {
     }
 
     public StreamBuilder include(final String begin, final String end, final boolean caseSensitive, final boolean retainDelimiters) {
-        stream = new IncludeFilterInputStream(stream, begin, end, caseSensitive, retainDelimiters);
+        in = new IncludeFilterInputStream(in, begin, end, caseSensitive, retainDelimiters);
         return this;
     }
 
@@ -48,12 +53,12 @@ public class StreamBuilder {
     }
 
     public StreamBuilder exclude(final String begin, final String end, final boolean caseSensitive, final boolean retainDelimiters) {
-        stream = new ExcludeFilterInputStream(stream, begin, end, caseSensitive, retainDelimiters);
+        in = new ExcludeFilterInputStream(in, begin, end, caseSensitive, retainDelimiters);
         return this;
     }
 
     public StreamBuilder delete(final String token) {
-        stream = new ReplaceStringInputStream(stream, token, "");
+        in = new ReplaceStringInputStream(in, token, "");
         return this;
     }
 
@@ -62,16 +67,98 @@ public class StreamBuilder {
     }
 
     public StreamBuilder deleteBetween(final String begin, final String end) {
-        stream = new ExcludeFilterInputStream(stream, begin, end, true, true);
+        in = new ExcludeFilterInputStream(in, begin, end, true, true);
         return this;
     }
 
     public StreamBuilder replace(final String token, final String with) {
-        stream = new ReplaceStringInputStream(stream, token, with);
+        in = new ReplaceStringInputStream(in, token, with);
         return this;
     }
 
+    public static StreamBuilder create(final InputStream in) {
+        return new StreamBuilder(in);
+    }
+
+    public StreamBuilder watch(final OutputStream consumer) {
+        in = new WatchAllInputStream(in, consumer);
+        return this;
+    }
+
+    public StreamBuilder watch(final String token, final Consumer<String> consumer) {
+        in = watch(in, token, consumer);
+        return this;
+    }
+
+    public StreamBuilder watch(final String begin, final String end, final Consumer<String> consumer) {
+        in = watch(in, begin, end, consumer);
+        return this;
+    }
+
+    public StreamBuilder substream(final String begin, final String end, final Function<InputStream, InputStream> decorator) {
+        in = substream(in, begin, end, decorator);
+        return this;
+    }
+
+    public static InputStream watch(final InputStream in, final String token, final Consumer<String> consumer) {
+        return new FixedTokenReplacementInputStream(in, token, new StringTokenHandler() {
+            @Override
+            public String handleToken(String s) throws IOException {
+                consumer.accept(s);
+                return s;
+            }
+        });
+    }
+
+    public static InputStream watch(final InputStream in, final String begin, final String end, final Consumer<String> consumer) {
+        return new DelimitedTokenReplacementInputStream(in, begin, end, new StringTokenHandler() {
+            @Override
+            public String handleToken(String s) throws IOException {
+                consumer.accept(s);
+                return begin + s + end;
+            }
+        });
+    }
+
+    public static InputStream substream(final InputStream in, final String begin, final String end, final Function<InputStream, InputStream> decorator) {
+        return new DelimitedTokenReplacementInputStream(in, begin, end, s -> {
+            return decorator.apply(new ByteArrayInputStream(s.getBytes()));
+        }
+        );
+    }
+
+    public void to(final OutputStream out) throws IOException {
+        copy(in, out);
+    }
+
+    private static class WatchAllInputStream extends InputStream {
+
+        private final InputStream in;
+        private final OutputStream consumer;
+
+        public WatchAllInputStream(final InputStream in, final OutputStream consumer) {
+            this.in = in;
+            this.consumer = consumer;
+        }
+
+        @Override
+        public int read() throws IOException {
+            final int read = in.read();
+            consumer.write(read);
+            return read;
+        }
+    }
+
     public InputStream get() {
-        return stream;
+        return in;
+    }
+
+    private static void copy(final InputStream from, final OutputStream to) throws IOException {
+        final byte[] buffer = new byte[1024];
+        int length;
+        while ((length = from.read(buffer)) != -1) {
+            to.write(buffer, 0, length);
+        }
+        to.flush();
     }
 }

@@ -65,7 +65,6 @@ public class StreamBuilderTest {
 
         final InputStream in = new StreamBuilder(IO.read(largeHtml)).deleteBetween("<div", ">").get();
 
-
         final String actual = IO.slurp(in).replace("<", "\n<");
         final String expected = largeHtml.replaceAll("<div[^>]+>", "<div>").replace("<", "\n<");
         Assert.assertEquals(expected, actual);
