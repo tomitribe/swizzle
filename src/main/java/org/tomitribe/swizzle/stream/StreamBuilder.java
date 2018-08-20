@@ -86,38 +86,48 @@ public class StreamBuilder {
     }
 
     public StreamBuilder watch(final String token, final Consumer<String> consumer) {
-        in = watch(in, token, consumer);
+        in = new FixedTokenWatchInputStream(in, token, consumer);
+        return this;
+    }
+
+    public StreamBuilder watch(final String token, final boolean caseSensitive, final Consumer<String> consumer) {
+        in = new FixedTokenWatchInputStream(in, token, caseSensitive, consumer);
         return this;
     }
 
     public StreamBuilder watch(final String begin, final String end, final Consumer<String> consumer) {
-        in = watch(in, begin, end, consumer);
+        in = new DelimitedTokenWatchInputStream(in, begin, end, consumer);
+        return this;
+    }
+
+    public StreamBuilder watch(final String begin, final String end, final boolean caseSensitive, final boolean includeDelimiters, final Consumer<String> consumer) {
+        in = new DelimitedTokenWatchInputStream(in, begin, end, caseSensitive, includeDelimiters, consumer);
+        return this;
+    }
+
+    public StreamBuilder watch(final String token, final Runnable runnable) {
+        in = new FixedTokenWatchInputStream(in, token, runnable);
+        return this;
+    }
+
+    public StreamBuilder watch(final String token, final boolean caseSensitive, final Runnable runnable) {
+        in = new FixedTokenWatchInputStream(in, token, caseSensitive, runnable);
+        return this;
+    }
+
+    public StreamBuilder watch(final String begin, final String end, final Runnable runnable) {
+        in = new DelimitedTokenWatchInputStream(in, begin, end, runnable);
+        return this;
+    }
+
+    public StreamBuilder watch(final String begin, final String end, final boolean caseSensitive, final boolean includeDelimiters, final Runnable runnable) {
+        in = new DelimitedTokenWatchInputStream(in, begin, end, caseSensitive, includeDelimiters, runnable);
         return this;
     }
 
     public StreamBuilder substream(final String begin, final String end, final Function<InputStream, InputStream> decorator) {
         in = substream(in, begin, end, decorator);
         return this;
-    }
-
-    public static InputStream watch(final InputStream in, final String token, final Consumer<String> consumer) {
-        return new FixedTokenReplacementInputStream(in, token, new StringTokenHandler() {
-            @Override
-            public String handleToken(String s) throws IOException {
-                consumer.accept(s);
-                return s;
-            }
-        });
-    }
-
-    public static InputStream watch(final InputStream in, final String begin, final String end, final Consumer<String> consumer) {
-        return new DelimitedTokenReplacementInputStream(in, begin, end, new StringTokenHandler() {
-            @Override
-            public String handleToken(String s) throws IOException {
-                consumer.accept(s);
-                return begin + s + end;
-            }
-        });
     }
 
     public static InputStream substream(final InputStream in, final String begin, final String end, final Function<InputStream, InputStream> decorator) {
@@ -129,6 +139,14 @@ public class StreamBuilder {
 
     public void to(final OutputStream out) throws IOException {
         copy(in, out);
+    }
+
+    public void run() throws IOException {
+        to(new OutputStream() {
+            @Override
+            public void write(final int b) throws IOException {
+            }
+        });
     }
 
     private static class WatchAllInputStream extends InputStream {
