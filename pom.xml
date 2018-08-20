@@ -25,7 +25,7 @@
 
   <artifactId>swizzle</artifactId>
   <name>Swizzle :: Stream</name>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:git@github.com:tomitribe/swizzle.git</connection>
@@ -52,21 +52,6 @@
       </releases>
     </repository>
   </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>tomitribe.releases.https</id>
-      <name>Tomitribe Release Distribution Repository</name>
-      <!--<url>http://repository.tomitribe.com/content/repositories/releases-tomitribe</url>-->
-      <url>http://repository.tomitribe.com/service/local/staging/deploy/maven2</url>
-    </repository>
-
-    <snapshotRepository>
-      <id>tomitribe.snapshots.https</id>
-      <name>Tomitribe Development Snapshot Repository</name>
-      <url>http://repository.tomitribe.com/content/repositories/snapshots-tomitribe</url>
-    </snapshotRepository>
-  </distributionManagement>
 
   <dependencies>
     <dependency>
