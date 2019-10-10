@@ -38,7 +38,7 @@ public class DelimitedTokenReplacementInputStream extends FilteredInputStream {
         beginBuffer = new ScanBuffer(begin, caseSensitive);
         endBuffer = new ScanBuffer(end, caseSensitive);
 
-        strategy = fillBeginBuffer;
+        strategy = this::fillBeginBuffer;
     }
 
     private DelimitedTokenReplacementInputStream.StreamReadingStrategy strategy;
@@ -54,97 +54,90 @@ public class DelimitedTokenReplacementInputStream extends FilteredInputStream {
         int _read() throws IOException;
     }
 
-    private final DelimitedTokenReplacementInputStream.StreamReadingStrategy readingToken = new DelimitedTokenReplacementInputStream.StreamReadingStrategy() {
-        public int _read() throws IOException {
-            endBuffer.flush();
-            StringBuffer token = new StringBuffer();
+    private int readingToken() throws IOException {
+        endBuffer.flush();
+        StringBuffer token = new StringBuffer();
 
-            while (true) {
-                int stream = superRead();
-                int buffer = endBuffer.append(stream);
-                char s = (char) stream, b = (char) buffer;
+        while (true) {
+            int stream = superRead();
+            int buffer = endBuffer.append(stream);
+            char s = (char) stream, b = (char) buffer;
 
-                if (buffer == -1 && stream != -1) {
-                    // Have we just started?
-                    continue;
-                } else if (buffer == -1 && stream == -1) {
-                    token.insert(0, beginBuffer.getScanString());
-                    value = new ByteArrayInputStream(token.toString().getBytes());
-                    endBuffer.resetPosition();
-                    strategy = flushingValue;
-                    return strategy._read();
-                }
-
-                token.append((char) buffer);
-
-                if (endBuffer.match()) {
-                    break;
-                }
-            }
-
-            value = handler.processToken(token.toString());
-            strategy = flushingValue;
-
-            return strategy._read();
-        }
-    };
-
-    private final DelimitedTokenReplacementInputStream.StreamReadingStrategy flushingValue = new DelimitedTokenReplacementInputStream.StreamReadingStrategy() {
-        public int _read() throws IOException {
-            // todo is this correct?
-            if (value == null) {
-                return -1;
-            }
-            int i = value.read();
-            if (i == -1) {
-                strategy = fillBeginBuffer;
-                i = strategy._read();
-            }
-            return i;
-        }
-    };
-
-    private final DelimitedTokenReplacementInputStream.StreamReadingStrategy fillBeginBuffer = new DelimitedTokenReplacementInputStream.StreamReadingStrategy() {
-        public int _read() throws IOException {
-
-            if (beginBuffer.size() == 0) {
-                strategy = readingToken;
+            if (buffer == -1 && stream != -1) {
+                // Have we just started?
+                continue;
+            } else if (buffer == -1 && stream == -1) {
+                token.insert(0, beginBuffer.getScanString());
+                value = new ByteArrayInputStream(token.toString().getBytes());
+                endBuffer.resetPosition();
+                strategy = this::flushingValue;
                 return strategy._read();
             }
 
-            // Reset the buffer
-            beginBuffer.flush();
+            token.append((char) buffer);
 
-            // Fill up the begin buffer
-            for (int i = 0; i < beginBuffer.size(); i++) {
-                int stream = superRead();
-                beginBuffer.append(stream);
+            if (endBuffer.match()) {
+                break;
             }
+        }
 
-            if (beginBuffer.match()) {
-                beginBuffer.flush();
-                strategy = readingToken;
-            } else {
-                strategy = primedBeginBuffer;
-            }
+        value = handler.processToken(token.toString());
+        strategy = this::flushingValue;
 
+        return strategy._read();
+    }
+
+    private int flushingValue() throws IOException {
+        // todo is this correct?
+        if (value == null) {
+            return -1;
+        }
+        int i = value.read();
+        if (i == -1) {
+            strategy = this::fillBeginBuffer;
+            i = strategy._read();
+        }
+        return i;
+    }
+
+    private int fillBeginBuffer() throws IOException {
+
+        if (beginBuffer.size() == 0) {
+            strategy = this::readingToken;
             return strategy._read();
         }
-    };
 
-    private final DelimitedTokenReplacementInputStream.StreamReadingStrategy primedBeginBuffer = new DelimitedTokenReplacementInputStream.StreamReadingStrategy() {
-        public int _read() throws IOException {
+        // Reset the buffer
+        beginBuffer.flush();
 
-            int buffered = beginBuffer.append(superRead());
-
-            if (beginBuffer.match()) {
-                beginBuffer.flush();
-                strategy = readingToken;
-            }
-
-            return buffered;
+        // Fill up the begin buffer
+        for (int i = 0; i < beginBuffer.size(); i++) {
+            int stream = superRead();
+            beginBuffer.append(stream);
         }
-    };
+
+        if (beginBuffer.match()) {
+            beginBuffer.flush();
+            strategy = this::readingToken;
+        } else {
+            strategy = this::scanBegin;
+        }
+
+        return strategy._read();
+    }
+
+    private int scanBegin() throws IOException {
+
+        int buffered = beginBuffer.append(superRead());
+
+        if (beginBuffer.match()) {
+            beginBuffer.flush();
+            strategy = this::readingToken;
+        }
+
+        return buffered;
+    }
+
 
     private int superRead() throws IOException {
         return super.read();
