@@ -81,7 +81,7 @@ public class ScanBuffer {
     }
 
     public int append(int newByte) {
-        if(token.length == 0) return newByte;
+        if (token.length == 0) return newByte;
         int old = buffer2[pos];
 
         buffer2[pos] = newByte;
@@ -101,6 +101,7 @@ public class ScanBuffer {
     }
 
     public boolean match() {
+        if (size() == 0) return true;
 
         // Absolute position (apos) is the number of characters actually
         // searched.

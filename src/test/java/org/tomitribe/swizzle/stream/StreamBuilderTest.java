@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.tomitribe.util.IO;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public class StreamBuilderTest {
@@ -76,6 +77,32 @@ public class StreamBuilderTest {
         final String expected = "<td>one</td><td>two</td>";
 
         final InputStream in = new StreamBuilder(IO.read(largeHtml)).deleteBetween("<td", ">").get();
+        final String actual = IO.slurp(in);
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDeleteBetween3() throws Exception {
+        final String largeHtml = "<td >one</td><td class='red'>two</td>";
+        final String expected = "two</td>";
+
+        final InputStream in = new StreamBuilder(IO.read(largeHtml))
+                .deleteBetween("", "two")
+                .get();
+
+        final String actual = IO.slurp(in);
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testReplaceBeginEnd() throws IOException {
+        final String largeHtml = "{FOO}abc";
+        final String expected = "appleabc";
+
+        final InputStream in = new StreamBuilder(IO.read(largeHtml))
+                .replace("{", "}", "apple")
+                .get();
+
         final String actual = IO.slurp(in);
         Assert.assertEquals(expected, actual);
     }
