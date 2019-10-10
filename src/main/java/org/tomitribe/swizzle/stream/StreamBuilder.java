@@ -58,22 +58,43 @@ public class StreamBuilder {
     }
 
     public StreamBuilder delete(final String token) {
-        in = new ReplaceStringInputStream(in, token, "");
-        return this;
+        return replace(token, "");
     }
 
-    public StreamBuilder deleteBetween(final String begin, final String end, final boolean caseSensitive) {
-        return exclude(begin, end, caseSensitive, false);
+    public StreamBuilder delete(final String begin, final String end) {
+        return replace(begin, end, "");
     }
 
     public StreamBuilder deleteBetween(final String begin, final String end) {
-        in = new ExcludeFilterInputStream(in, begin, end, true, true);
-        return this;
+        return replaceBetween(begin, end, "");
     }
 
     public StreamBuilder replace(final String token, final String with) {
-        in = new ReplaceStringInputStream(in, token, with);
+        return replace(token, s -> with);
+    }
+
+    public StreamBuilder replace(final String token, final StringHandler with) {
+        in = new FixedTokenReplacementInputStream(in, token, with);
         return this;
+    }
+
+    public StreamBuilder replace(final String begin, final String end, final StringHandler handler) {
+        in = new DelimitedTokenReplacementInputStream(in, begin, end, handler);
+        return this;
+    }
+
+    public StreamBuilder replace(final String begin, final String end, final String with) {
+        return replace(begin, end, s -> with);
+    }
+
+    public StreamBuilder replaceBetween(final String begin, final String end, final StringHandler handler) {
+        final StringHandler includeDelimiters = s -> begin + handler.apply(s) + end;
+        in = new DelimitedTokenReplacementInputStream(in, begin, end, includeDelimiters);
+        return this;
+    }
+
+    public StreamBuilder replaceBetween(final String begin, final String end, final String with) {
+        return replaceBetween(begin, end, s -> with);
     }
 
     public static StreamBuilder create(final InputStream in) {

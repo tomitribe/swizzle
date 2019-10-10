@@ -38,7 +38,7 @@ public class DelimitedTokenReplacementInputStream extends FilteredInputStream {
         beginBuffer = new ScanBuffer(begin, caseSensitive);
         endBuffer = new ScanBuffer(end, caseSensitive);
 
-        strategy = lookingForToken;
+        strategy = fillBeginBuffer;
     }
 
     private DelimitedTokenReplacementInputStream.StreamReadingStrategy strategy;
@@ -97,39 +97,52 @@ public class DelimitedTokenReplacementInputStream extends FilteredInputStream {
             }
             int i = value.read();
             if (i == -1) {
-                strategy = lookingForToken;
+                strategy = fillBeginBuffer;
                 i = strategy._read();
             }
             return i;
         }
     };
 
-    private final DelimitedTokenReplacementInputStream.StreamReadingStrategy lookingForToken = new DelimitedTokenReplacementInputStream.StreamReadingStrategy() {
+    private final DelimitedTokenReplacementInputStream.StreamReadingStrategy fillBeginBuffer = new DelimitedTokenReplacementInputStream.StreamReadingStrategy() {
         public int _read() throws IOException {
+
             if (beginBuffer.size() == 0) {
                 strategy = readingToken;
                 return strategy._read();
             }
 
-            int stream = superRead();
-            int buffer = beginBuffer.append(stream);
+            // Reset the buffer
+            beginBuffer.flush();
+
+            // Fill up the begin buffer
+            for (int i = 0; i < beginBuffer.size(); i++) {
+                int stream = superRead();
+                beginBuffer.append(stream);
+            }
 
             if (beginBuffer.match()) {
                 beginBuffer.flush();
-
                 strategy = readingToken;
-                // return reader._read();
-                return (buffer == -1 && stream != -1) ? read() : buffer;
+            } else {
+                strategy = primedBeginBuffer;
             }
 
-            // Have we just started?
+            return strategy._read();
+        }
+    };
 
-            // The buffer starts out in -1 state. If the
-            // data coming from the stream is valid, we
-            // need to just keep reading till the buffer
-            // gives us good data.
-//            return (buffer == -1 && stream != -1) ? _read() : buffer;
-            return (buffer == -1 && ((stream != -1) || (beginBuffer.hasData()))) ? _read() : buffer;
+    private final DelimitedTokenReplacementInputStream.StreamReadingStrategy primedBeginBuffer = new DelimitedTokenReplacementInputStream.StreamReadingStrategy() {
+        public int _read() throws IOException {
+
+            int buffered = beginBuffer.append(superRead());
+
+            if (beginBuffer.match()) {
+                beginBuffer.flush();
+                strategy = readingToken;
+            }
+
+            return buffered;
         }
     };
 

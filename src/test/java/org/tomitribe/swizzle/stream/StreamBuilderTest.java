@@ -71,6 +71,16 @@ public class StreamBuilderTest {
     }
 
     @Test
+    public void testDeleteBetween2() throws Exception {
+        final String largeHtml = "<td >one</td><td class='red'>two</td>";
+        final String expected = "<td>one</td><td>two</td>";
+
+        final InputStream in = new StreamBuilder(IO.read(largeHtml)).deleteBetween("<td", ">").get();
+        final String actual = IO.slurp(in);
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
     public void testDeleteBetween1() throws Exception {
 
     }
