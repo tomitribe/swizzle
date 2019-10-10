@@ -208,8 +208,14 @@ public class DelimitedTokenReplacementInputStream extends FilteredInputStream {
      * and move onto the first step, {@link #fillBeginBuffer()}
      */
     private int startReplacement() throws IOException {
-        final String token = this.token.toString();
-        this.token = null;
+
+        final String token;
+        if (this.token == null) {
+            token = "";
+        } else {
+            token = this.token.toString();
+            this.token = null;
+        }
 
         value = handler.processToken(token);
 
