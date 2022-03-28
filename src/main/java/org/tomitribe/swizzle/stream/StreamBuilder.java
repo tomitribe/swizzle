@@ -16,12 +16,17 @@
  */
 package org.tomitribe.swizzle.stream;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
+import java.nio.charset.Charset;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class StreamBuilder {
 
@@ -101,6 +106,31 @@ public class StreamBuilder {
         return new StreamBuilder(in);
     }
 
+    public static StreamBuilder of(final InputStream in) {
+        return new StreamBuilder(in);
+    }
+
+    public static StreamBuilder of(final File file) {
+        try {
+            final InputStream in = new FileInputStream(file);
+            return new StreamBuilder(new BufferedInputStream(in, 8192 * 4));
+        } catch (FileNotFoundException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static StreamBuilder of(final byte[] bytes) {
+        return new StreamBuilder(new ByteArrayInputStream(bytes));
+    }
+
+    public static StreamBuilder of(final String contents) {
+        return new StreamBuilder(new ByteArrayInputStream(contents.getBytes()));
+    }
+
+    public static StreamBuilder of(final String contents, final Charset charset) {
+        return new StreamBuilder(new ByteArrayInputStream(contents.getBytes(charset)));
+    }
+
     public StreamBuilder watch(final OutputStream consumer) {
         in = new WatchAllInputStream(in, consumer);
         return this;
@@ -146,12 +176,12 @@ public class StreamBuilder {
         return this;
     }
 
-    public StreamBuilder substream(final String begin, final String end, final Function<InputStream, InputStream> decorator) {
+    public StreamBuilder substream(final String begin, final String end, final IOFunction<InputStream, InputStream> decorator) {
         in = substream(in, begin, end, decorator);
         return this;
     }
 
-    public static InputStream substream(final InputStream in, final String begin, final String end, final Function<InputStream, InputStream> decorator) {
+    public static InputStream substream(final InputStream in, final String begin, final String end, final IOFunction<InputStream, InputStream> decorator) {
         return new DelimitedTokenReplacementInputStream(in, begin, end, s -> {
             return decorator.apply(new ByteArrayInputStream(s.getBytes()));
         }
@@ -168,6 +198,46 @@ public class StreamBuilder {
             public void write(final int b) throws IOException {
             }
         });
+    }
+
+    /**
+     * Applies the function to the enclosed InputStream to consume
+     * the data.  Any IOExceptions thrown by the IOFunction will be
+     * converted to an UncheckedIOException.  The InputStream will
+     * be closed after the IOFunction completes.
+     */
+    public <R> R consume(final IOFunction<InputStream, R> ioFunction) {
+        try {
+            return ioFunction.apply(in);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+    }
+
+    /**
+     * Applies the consumer to the enclosed InputStream to consume
+     * the data.  Any IOExceptions thrown by the IOConsumer will be
+     * converted to an UncheckedIOException.  The InputStream will
+     * be closed after the IOConsumer completes.
+     */
+    public void consume(final IOConsumer<InputStream> consumer) {
+        try {
+            consumer.accept(in);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
     }
 
     private static class WatchAllInputStream extends InputStream {
