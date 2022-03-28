@@ -206,7 +206,7 @@ public class StreamBuilder {
      * converted to an UncheckedIOException.  The InputStream will
      * be closed after the IOFunction completes.
      */
-    public <R> R consume(final IOFunction<InputStream, R> ioFunction) {
+    public <R> R apply(final IOFunction<InputStream, R> ioFunction) {
         try {
             return ioFunction.apply(in);
         } catch (IOException e) {
@@ -221,10 +221,10 @@ public class StreamBuilder {
     }
 
     /**
-     * Applies the consumer to the enclosed InputStream to consume
-     * the data.  Any IOExceptions thrown by the IOConsumer will be
-     * converted to an UncheckedIOException.  The InputStream will
-     * be closed after the IOConsumer completes.
+     * Uses the supplied IOConsumber to consume the enclosed InputStream
+     * Any IOExceptions thrown by the IOConsumer will be converted to an
+     * UncheckedIOException.  The InputStream will be closed after the
+     * IOConsumer completes.
      */
     public void consume(final IOConsumer<InputStream> consumer) {
         try {
