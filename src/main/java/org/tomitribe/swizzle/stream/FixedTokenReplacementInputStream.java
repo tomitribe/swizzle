@@ -107,28 +107,37 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
 
     private final StreamReadingStrategy readingToken = new StreamReadingStrategy() {
         public int _read() throws IOException {
-            int stream = superRead();
-            int buffer = tokenBuffer.append(stream);
+            while (true) {
+                int stream = superRead();
+                int buffer = tokenBuffer.append(stream);
 
-            if (tokenBuffer.match()) {
-                tokenBuffer.flush();
+                if (tokenBuffer.match()) {
+                    tokenBuffer.flush();
 
-                String token = tokenBuffer.getScanString();
-                value = handler.processToken(token);
-                strategy = flushingValue;
+                    String token = tokenBuffer.getScanString();
+                    value = handler.processToken(token);
+                    strategy = flushingValue;
 
-                int i = (buffer == -1 && stream != -1) ? read() : buffer;
-                return i;
+                    int i = (buffer == -1 && stream != -1) ? read() : buffer;
+                    return i;
+                }
+
+                // Have we just started?
+
+                // The buffer starts out in -1 state. If the
+                // data coming from the stream is valid, we
+                // need to just keep reading till the buffer
+                // gives us good data.
+                if (buffer == -1) {
+                    if (tokenBuffer.hasData()) {
+                        continue;
+                    } else {
+                        strategy = done;
+                        return -1;
+                    }
+                }
+                return buffer;
             }
-
-            // Have we just started?
-
-            // The buffer starts out in -1 state. If the
-            // data coming from the stream is valid, we
-            // need to just keep reading till the buffer
-            // gives us good data.
-            int i = (buffer == -1 && tokenBuffer.hasData()) ? _read() : buffer;
-            return i;
         }
     };
 
