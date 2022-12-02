@@ -30,6 +30,18 @@ import java.io.InputStream;
 
 public class ReplaceStringInputStreamTest extends TestCase {
 
+    public void testReplacement() throws IOException {
+        String original = "RED";
+        String expected = "pear";
+        InputStream in = StreamUtils.stringToStream(original);
+
+        in = new ReplaceStringInputStream(in, "RED", "pear");
+
+        String actual = StreamUtils.streamToString(in);
+
+        assertEquals(expected, actual);
+    }
+
     public void testTokenFilterInputStream() throws Exception {
         String original = "";
         String expected = "";
