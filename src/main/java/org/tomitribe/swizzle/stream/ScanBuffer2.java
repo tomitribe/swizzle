@@ -44,7 +44,7 @@ public class ScanBuffer2 {
         buffer[bindex] = (byte) newByte;
 
         bindex = bindex + 1 < buffer.length ? bindex + 1 : 0;
-        matching = (matching || length == 0) && (expected == newByte);
+        matching = (matching || length == 0) && matches(newByte, expected);
 
         length = Math.min(length + 1, buffer.length);
 
@@ -55,6 +55,11 @@ public class ScanBuffer2 {
 
 
         return old;
+    }
+
+    private boolean matches(int newByte, byte expected) {
+        if (caseSensitive) return expected == newByte;
+        return expected == Character.toLowerCase(newByte);
     }
 
     public int drain() {
@@ -71,11 +76,11 @@ public class ScanBuffer2 {
         matching = true;
 
         for (; matching && index < buffer.length && tindex < token.length && tindex < length; index++, tindex++) {
-            matching = buffer[index] == token[tindex];
+            matching = matches(token[tindex], buffer[index]);
         }
 
         for (index = 0; matching && index < buffer.length && tindex < token.length && tindex < length; index++, tindex++) {
-            matching = buffer[index] == token[tindex];
+            matching = matches(token[tindex], buffer[index]);
         }
 
         matched = matching && length == token.length;

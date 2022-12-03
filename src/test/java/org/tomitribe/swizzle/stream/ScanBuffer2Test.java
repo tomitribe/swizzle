@@ -162,7 +162,6 @@ public class ScanBuffer2Test {
 
     }
 
-    @Ignore
     @Test
     public void caseInsensitive2() {
         final ScanBuffer2 buffer = new ScanBuffer2("red", false);
