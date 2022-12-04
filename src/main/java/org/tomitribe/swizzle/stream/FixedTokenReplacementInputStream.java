@@ -20,19 +20,18 @@ import java.io.InputStream;
 
 public class FixedTokenReplacementInputStream extends FilteredInputStream {
 
-    private final ScanBuffer tokenBuffer;
+    private final ScanBuffer2 tokenBuffer;
     private final StreamTokenHandler handler;
-    private InputStream value;
     private String token;
     private byte firstByte;
 
-    public FixedTokenReplacementInputStream(InputStream in, String token, StreamTokenHandler handler) {
+    public FixedTokenReplacementInputStream(final InputStream in, final String token, final StreamTokenHandler handler) {
         this(in, token, handler, true);
     }
 
     public FixedTokenReplacementInputStream(InputStream in, String token, StreamTokenHandler handler, boolean caseSensitive) {
         super(in);
-        this.tokenBuffer = new ScanBuffer(token, caseSensitive);
+        this.tokenBuffer = new ScanBuffer2(token, caseSensitive);
         this.handler = handler;
         this.strategy = lookingForToken;
         this.token = token;
@@ -52,18 +51,76 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
         int _read() throws IOException;
     }
 
-    private final StreamReadingStrategy flushingValue = new StreamReadingStrategy() {
-        public int _read() throws IOException {
-            int i = value.read();
-            if (i == -1) {
-                strategy = lookingForToken;
-                i = read();
-            }
-            return i;
-        }
-    };
+    private final StreamReadingStrategy lookingForToken = new LookingForToken();
 
-    private final StreamReadingStrategy lookingForToken = new StreamReadingStrategy() {
+    private final StreamReadingStrategy readingToken = new ReadingToken();
+
+    private final StreamReadingStrategy done = new Done();
+
+
+    private int superRead() throws IOException {
+        final int read = super.read();
+        return read;
+    }
+
+    private static class Done implements StreamReadingStrategy {
+        @Override
+        public int _read() throws IOException {
+            return -1;
+        }
+    }
+
+    private class FlushingToken implements StreamReadingStrategy {
+
+        private final InputStream inputStream;
+
+        public FlushingToken(final InputStream inputStream) {
+            this.inputStream = inputStream;
+        }
+
+        public int _read() throws IOException {
+            int i = inputStream.read();
+            if (i != -1) return i;
+
+            strategy = lookingForToken;
+            return read();
+        }
+    }
+
+    private class ReadingToken implements StreamReadingStrategy {
+        public int _read() throws IOException {
+            while (true) {
+                int stream = superRead();
+                int buffer = tokenBuffer.append(stream);
+
+                if (tokenBuffer.matches()) {
+                    tokenBuffer.reset();
+                    strategy = new FlushingToken(handler.processToken(token));
+
+                    int i = (buffer == -1 && stream != -1) ? read() : buffer;
+                    return i;
+                }
+
+                // Have we just started?
+
+                // The buffer starts out in -1 state. If the
+                // data coming from the stream is valid, we
+                // need to just keep reading till the buffer
+                // gives us good data.
+                if (buffer == -1) {
+                    if (tokenBuffer.available() > 0) {
+                        continue;
+                    } else {
+                        strategy = done;
+                        return -1;
+                    }
+                }
+                return buffer;
+            }
+        }
+    }
+
+    private class LookingForToken implements StreamReadingStrategy {
         public int _read() throws IOException {
             int stream = superRead();
 
@@ -83,14 +140,10 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
 
             int buffer = tokenBuffer.append(stream);
 
-            if (tokenBuffer.match()) {
-                tokenBuffer.flush();
+            if (tokenBuffer.matches()) {
+                strategy = new FlushingToken(handler.processToken(token));
 
-                String token = tokenBuffer.getScanString();
-                value = handler.processToken(token);
-                strategy = flushingValue;
-
-                int i = (buffer == -1 && stream != -1) ? read() : buffer;
+                int i = (buffer == -1) ? read() : buffer;
                 return i;
             }
 
@@ -100,56 +153,8 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
             // data coming from the stream is valid, we
             // need to just keep reading till the buffer
             // gives us good data.
-            int i = (buffer == -1 && tokenBuffer.hasData()) ? read() : buffer;
+            int i = (buffer == -1 && tokenBuffer.available() > 0) ? read() : buffer;
             return i;
         }
-    };
-
-    private final StreamReadingStrategy readingToken = new StreamReadingStrategy() {
-        public int _read() throws IOException {
-            while (true) {
-                int stream = superRead();
-                int buffer = tokenBuffer.append(stream);
-
-                if (tokenBuffer.match()) {
-                    tokenBuffer.flush();
-
-                    String token = tokenBuffer.getScanString();
-                    value = handler.processToken(token);
-                    strategy = flushingValue;
-
-                    int i = (buffer == -1 && stream != -1) ? read() : buffer;
-                    return i;
-                }
-
-                // Have we just started?
-
-                // The buffer starts out in -1 state. If the
-                // data coming from the stream is valid, we
-                // need to just keep reading till the buffer
-                // gives us good data.
-                if (buffer == -1) {
-                    if (tokenBuffer.hasData()) {
-                        continue;
-                    } else {
-                        strategy = done;
-                        return -1;
-                    }
-                }
-                return buffer;
-            }
-        }
-    };
-
-    private final StreamReadingStrategy done = new StreamReadingStrategy() {
-        @Override
-        public int _read() throws IOException {
-            return -1;
-        }
-    };
-
-
-    private int superRead() throws IOException {
-        return super.read();
     }
 }

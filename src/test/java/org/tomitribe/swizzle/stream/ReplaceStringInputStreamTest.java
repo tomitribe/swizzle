@@ -42,6 +42,30 @@ public class ReplaceStringInputStreamTest extends TestCase {
         assertEquals(expected, actual);
     }
 
+    public void testReplacement2() throws IOException {
+        final String original = "BLUE GREEN PURPLE RED RREM";
+        final String expected = "BLUE GREEN PURPLE YELLOW RREM";
+        InputStream in = StreamUtils.stringToStream(original);
+
+        in = new ReplaceStringInputStream(in, "RED", "YELLOW");
+
+        final String actual = StreamUtils.streamToString(in);
+
+        assertEquals(expected, actual);
+    }
+
+    public void testReplacement3() throws IOException {
+        final String original = "RED RREM";
+        final String expected = "YELLOW RREM";
+        InputStream in = StreamUtils.stringToStream(original);
+
+        in = new ReplaceStringInputStream(in, "RED", "YELLOW");
+
+        final String actual = StreamUtils.streamToString(in);
+
+        assertEquals(expected, actual);
+    }
+
     public void testTokenFilterInputStream() throws Exception {
         String original = "";
         String expected = "";
@@ -119,10 +143,6 @@ public class ReplaceStringInputStreamTest extends TestCase {
         expected = "bananaabpearz";
         swizzleAndAssert(original, expected);
 
-        original = "abBLUEREDyzGREEN";
-        expected = "abbananapearyzgrape";
-        swizzleAndAssert(original, expected);
-
         original = "abcdefghiGREENjklREDwxyz";
         expected = "abcdefghigrapejklpearwxyz";
         swizzleAndAssert(original, expected);
@@ -131,6 +151,14 @@ public class ReplaceStringInputStreamTest extends TestCase {
         expected = "abcgrapegrapedebananabananafgrapebananaghipearstuvwxyz";
         swizzleAndAssert(original, expected);
 
+    }
+
+    public void testThis() throws IOException {
+        String expected;
+        String original;
+        original = "abBLUEREDyzGREEN";
+        expected = "abbananapearyzgrape";
+        swizzleAndAssert(original, expected);
     }
 
     private void swizzleAndAssert(String original, String expected) throws IOException {
