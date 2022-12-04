@@ -20,7 +20,7 @@ import java.io.InputStream;
 
 public class FixedTokenReplacementInputStream extends FilteredInputStream {
 
-    private final ScanBuffer2 tokenBuffer;
+    private final ScanBuffer2 buffer;
     private final StreamTokenHandler handler;
     private String token;
     private byte firstByte;
@@ -31,7 +31,7 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
 
     public FixedTokenReplacementInputStream(InputStream in, String token, StreamTokenHandler handler, boolean caseSensitive) {
         super(in);
-        this.tokenBuffer = new ScanBuffer2(token, caseSensitive);
+        this.buffer = new ScanBuffer2(token, caseSensitive);
         this.handler = handler;
         this.strategy = lookingForToken;
         this.token = token;
@@ -51,10 +51,9 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
         int _read() throws IOException;
     }
 
+    private final StreamReadingStrategy flushingBuffer = new FlushingBuffer();
     private final StreamReadingStrategy lookingForToken = new LookingForToken();
-
     private final StreamReadingStrategy readingToken = new ReadingToken();
-
     private final StreamReadingStrategy done = new Done();
 
 
@@ -67,6 +66,24 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
         @Override
         public int _read() throws IOException {
             return -1;
+        }
+    }
+
+    private class FlushingBuffer implements StreamReadingStrategy {
+        @Override
+        public int _read() throws IOException {
+            if (buffer.available() > 0) {
+                final int drained = buffer.drain();
+
+                if (buffer.matching()) {
+                    strategy = readingToken;
+                }
+
+                return drained;
+            }
+
+            strategy = lookingForToken;
+            return read();
         }
     }
 
@@ -91,13 +108,19 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
         public int _read() throws IOException {
             while (true) {
                 int stream = superRead();
-                int buffer = tokenBuffer.append(stream);
+                int old = buffer.append(stream);
 
-                if (tokenBuffer.matches()) {
-                    tokenBuffer.reset();
+                if (buffer.matches()) {
+                    buffer.reset();
                     strategy = new FlushingToken(handler.processToken(token));
 
-                    int i = (buffer == -1 && stream != -1) ? read() : buffer;
+                    int i = (old == -1 && stream != -1) ? read() : old;
+                    return i;
+                }
+
+                if (!buffer.matching()) {
+                    strategy = flushingBuffer;
+                    int i = (old == -1 && stream != -1) ? read() : old;
                     return i;
                 }
 
@@ -107,15 +130,15 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
                 // data coming from the stream is valid, we
                 // need to just keep reading till the buffer
                 // gives us good data.
-                if (buffer == -1) {
-                    if (tokenBuffer.available() > 0) {
+                if (old == -1) {
+                    if (buffer.available() > 0) {
                         continue;
                     } else {
                         strategy = done;
                         return -1;
                     }
                 }
-                return buffer;
+                return old;
             }
         }
     }
@@ -138,12 +161,12 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
 
             strategy = readingToken;
 
-            int buffer = tokenBuffer.append(stream);
+            int old = buffer.append(stream);
 
-            if (tokenBuffer.matches()) {
+            if (buffer.matches()) {
                 strategy = new FlushingToken(handler.processToken(token));
 
-                int i = (buffer == -1) ? read() : buffer;
+                int i = (old == -1) ? read() : old;
                 return i;
             }
 
@@ -153,7 +176,7 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
             // data coming from the stream is valid, we
             // need to just keep reading till the buffer
             // gives us good data.
-            int i = (buffer == -1 && tokenBuffer.available() > 0) ? read() : buffer;
+            int i = (old == -1 && buffer.available() > 0) ? read() : old;
             return i;
         }
     }
