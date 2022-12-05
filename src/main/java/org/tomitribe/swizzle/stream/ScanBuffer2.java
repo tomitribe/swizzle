@@ -20,33 +20,67 @@ import java.util.Arrays;
 public class ScanBuffer2 {
 
     private final Value value;
-    private final String token;
+    private final byte[] token;
+    private int matched;
     private final boolean caseSensitive;
 
     public ScanBuffer2(final String token, final boolean caseSensitive) {
-//        this.token = new Buffer(caseSensitive ? token.getBytes() : token.toLowerCase().getBytes());
-        this.token = caseSensitive ? token : token.toLowerCase();
+        this.token = caseSensitive ? token.getBytes() : token.toLowerCase().getBytes();
         this.value = new Value(token.length());
 
         this.caseSensitive = caseSensitive;
     }
 
     public int append(int newByte) {
-        return value.add(newByte);
+        final int previous = value.add(newByte);
+
+        /*
+         * We can continue matching where we left off if we haven't lost any of the
+         * bytes we previously counted as matched or not matched.
+         */
+        final boolean resume = previous == -1;
+
+        if (resume) {
+            final byte expected = token[matched];
+            matched = matches(expected, newByte) ? matched + 1 : 0;
+        } else {
+            match();
+        }
+
+        return previous;
     }
 
-    private boolean matches(int newByte, int expected) {
-        if (caseSensitive) return expected == newByte;
-        return expected == Character.toLowerCase(newByte);
+    private void match() {
+
+        final Index index = new Index(value.start.max, value.start.position);
+
+        for (matched = 0; matched < value.length(); matched++, index.increment()) {
+
+            final byte expected = token[matched];
+            final byte actual = value.buffer.get(index.get());
+
+            if (!matches(expected, actual)) {
+                matched = 0;
+                break;
+            }
+        }
+    }
+
+    private boolean matches(int expected, int actual) {
+        if (caseSensitive) return expected == actual;
+        return expected == Character.toLowerCase(actual);
     }
 
     public int drain() {
-        return value.drain();
+        try {
+            return value.drain();
+        } finally {
+            match();
+        }
     }
 
     public boolean matches() {
-        if (caseSensitive) return token.equals(value.toString());
-        else return token.equalsIgnoreCase(value.toString());
+        return matched == token.length;
     }
 
     public int available() {
@@ -54,8 +88,7 @@ public class ScanBuffer2 {
     }
 
     public boolean matching() {
-        if (caseSensitive) return token.startsWith(value.toString());
-        else return token.startsWith(value.toString().toLowerCase());
+        return token.length == 0 || matched > 0;
     }
 
     public String asString() {
@@ -64,6 +97,7 @@ public class ScanBuffer2 {
 
     public void reset() {
         value.reset();
+        matched = 0;
     }
 
     /**
@@ -76,8 +110,13 @@ public class ScanBuffer2 {
         private final int max;
         private int position;
 
-        public Index(int max) {
+        public Index(final int max) {
             this.max = max;
+        }
+
+        public Index(final int max, final int position) {
+            this.max = max;
+            this.position = position;
         }
 
         public int get() {
@@ -224,8 +263,21 @@ public class ScanBuffer2 {
             return buffer.length;
         }
 
-        public int get() {
-            return buffer[index.get()];
+        public byte get() {
+            final int i = index.get();
+            return get(i);
+        }
+
+        public byte get(final int i) {
+            return buffer[i];
+        }
+
+        public byte getAndIncrement() {
+            try {
+                return buffer[index.get()];
+            } finally {
+                index.increment();
+            }
         }
 
         public int set(final int b) {
