@@ -24,6 +24,7 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
     private final StreamTokenHandler handler;
     private String token;
     private byte firstByte;
+    private boolean caseSensitive;
 
     public FixedTokenReplacementInputStream(final InputStream in, final String token, final StreamTokenHandler handler) {
         this(in, token, handler, true);
@@ -31,11 +32,12 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
 
     public FixedTokenReplacementInputStream(InputStream in, String token, StreamTokenHandler handler, boolean caseSensitive) {
         super(in);
-        this.buffer = new ScanBuffer2(token, caseSensitive);
+        this.caseSensitive = caseSensitive;
+        this.buffer = new ScanBuffer2(token, this.caseSensitive);
         this.handler = handler;
         this.strategy = lookingForToken;
         this.token = token;
-        this.firstByte = token.getBytes()[0];
+        this.firstByte = this.caseSensitive ? token.getBytes()[0] : (byte) Character.toLowerCase(token.getBytes()[0]);
     }
 
     private StreamReadingStrategy strategy;
@@ -155,7 +157,7 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
             /*
              * Have we potentially found the start of our token?
              */
-            if (stream != firstByte) {
+            if (matches(firstByte, stream)) {
                 return stream;
             }
 
@@ -179,5 +181,10 @@ public class FixedTokenReplacementInputStream extends FilteredInputStream {
             int i = (old == -1 && buffer.available() > 0) ? read() : old;
             return i;
         }
+    }
+
+    private boolean matches(final byte expected, final int actual) {
+        if (caseSensitive) return actual != expected;
+        return Character.toLowerCase(actual) != expected;
     }
 }
